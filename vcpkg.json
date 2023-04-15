@@ -1,0 +1,9 @@
+{
+  "name": "projectopengl",
+  "version-string": "0.0.1",
+  "dependencies": [
+    "sfml",
+    "glew",
+    "imgui-sfml"
+  ]
+}
