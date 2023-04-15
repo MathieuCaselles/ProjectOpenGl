@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.8)
 
 add_library(Engine)
-add_library(testCmakeVcpkg2::Engine ALIAS Engine)
+add_library(ProjectOpenGl::Engine ALIAS Engine)
 
 find_package(GLEW REQUIRED)
 find_package(SFML COMPONENTS system window graphics CONFIG REQUIRED)

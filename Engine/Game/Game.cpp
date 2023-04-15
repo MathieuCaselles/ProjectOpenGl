@@ -1,7 +1,6 @@
 #include "Game.h"
 #include <cassert>
 #include "../Scene/Scene.h"
-#include <iostream>
 
 namespace Engine {
 
@@ -93,7 +92,6 @@ void Game::processInput()
     sf::Event event;
     while (m_window.pollEvent(event))
     {
-        std::cout << "event" << std::endl;
         if (event.type == sf::Event::Closed)
             m_window.close();
         else if (event.type == sf::Event::Resized)
