@@ -52,4 +52,34 @@ namespace Engine {
 		std::vector<unsigned int> m_indices;
 	};
 
+	template<typename Type>
+	inline Terrain<Type>::Terrain()
+	{
+	}
+
+	template<typename Type>
+	inline Terrain<Type>::~Terrain()
+	{
+	}
+
+	template<typename Type>
+	inline void Terrain<Type>::generateTerrainVerticesIndices(float size, float step)
+	{
+	}
+
+	template<typename Type>
+	inline void Terrain<Type>::load()
+	{
+	}
+
+	template<typename Type>
+	inline void Terrain<Type>::render(const Tools::Mat4<Type>& View, const Tools::Mat4<Type>& Projection)
+	{
+	}
+
+	template<typename Type>
+	inline void Terrain<Type>::update()
+	{
+	}
+
 }
