@@ -1,6 +1,9 @@
 #include "Game.h"
 #include <cassert>
 #include "../Scene/Scene.h"
+#include "Tools/MathUtils.h"
+#include <GL/glew.h>
+#include<SFML/OpenGL.hpp>
 
 namespace Engine {
 
@@ -18,6 +21,7 @@ void Game::run(sf::VideoMode videoMode, std::string windowTitle, sf::Uint32 styl
 
     initWindow(videoMode, windowTitle, style);
 
+    glEnable(GL_DEPTH_TEST);
 
     // fucking lines of hell
     glewExperimental = GL_TRUE;
@@ -32,6 +36,8 @@ void Game::run(sf::VideoMode videoMode, std::string windowTitle, sf::Uint32 styl
 
     while (m_window.isOpen()) {
         float deltaTime = DeltaTimeClock.restart().asSeconds();
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         processInput();
         update(deltaTime);
@@ -83,6 +89,7 @@ void Game::initWindow(sf::VideoMode videoMode, std::string windowTitle, sf::Uint
 {
     m_window.create(videoMode, windowTitle, style, settings);
     m_window.setVerticalSyncEnabled(true);
+    m_window.setActive(true);
 }
 
 void Game::processInput()

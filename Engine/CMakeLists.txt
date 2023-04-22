@@ -26,4 +26,7 @@ target_include_directories(Engine PUBLIC
 target_sources(Engine PRIVATE
     "Game/Game.h" "Game/Game.cpp"
     "Scene/Scene.h" "Scene/Scene.cpp"
+    "Terrain/Terrain.h" "Terrain/Terrain.cpp"
+    "Terrain/Shader.h" "Terrain/Shader.cpp"
+    "Terrain/terrain.frag" "Terrain/terrain.vert" 
 )
