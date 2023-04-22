@@ -11,4 +11,4 @@ target_include_directories(ProceduralGeneration PUBLIC
 )
 
 target_sources(ProceduralGeneration PRIVATE
-   "Todo.h" "Todo.cpp")
+   "Grid3d.h" "Grid3d.cpp")

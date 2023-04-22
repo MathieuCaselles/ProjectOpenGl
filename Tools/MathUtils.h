@@ -1,17 +1,23 @@
 #include <math.h>
 
 namespace Tools {
-    struct Vector2f
-    {
-        Vector2f(float x, float y) :m_x(x), m_y(y) {};
+    template<typename Type>
+    struct Vector3
+    { 		
+		static_assert(std::is_arithmetic_v<Type>, "Type must be an arithmetic type.");
 
-        float m_x;
-        float m_y;
-    };
+		Vector3() :X(0), Y(0), Z(0) {};
+        Vector3(Type x, Type y, Type z) :X(x), Y(y), Z(z) {};
 
-    inline float getDistanceBetween2Points(const Vector2f& point1, const Vector2f& point2)
-    {
-        return sqrtf(powf(point2.m_x - point1.m_x, 2) + powf(point2.m_y - point1.m_y, 2));
-    }
+		Vector3 operator/(Type value) const
+		{
+			return Vector3(X / value, Y / value, Z / value);
+		}
+
+		Type X;
+		Type Y;
+		Type Z;
+	};
 }
+
 
