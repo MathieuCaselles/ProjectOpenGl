@@ -10,7 +10,12 @@ namespace ProceduralGeneration {
 
 Grid3d::Grid3d(int width, int height, int depth) : m_width(width), m_height(height), m_depth(depth)
 {
-	m_cells = std::vector<Vector3f>(width * height * depth, randomGradientVector());
+	m_cells.reserve(m_width * m_height * m_depth);
+
+	for (int z = 0; z < m_depth; ++z)
+		for (int y = 0; y < m_height; ++y)
+			for (int x = 0; x < m_width; ++x)
+				m_cells.emplace_back(randomGradientVector());
 }
 
 Grid3d::~Grid3d()
@@ -39,7 +44,8 @@ const Vector3f& Grid3d::getCell(const int& x, const int& y, const int& z) const
 
 void Grid3d::setCell(const int& x, const int& y, const int& z, Vector3f&& value)
 {
-	m_cells.emplace(m_cells.begin() + (x + y * m_width + z * m_width * m_height), std::move(value));
+	const auto index = x + y * m_width + z * m_width * m_height;
+	m_cells.emplace(m_cells.begin() + index, std::move(value));
 }
 
 

@@ -7,16 +7,17 @@
 
 int main()
 {
-    ProceduralGeneration::Grid3d grid(10, 10, 10);
+    ProceduralGeneration::Grid3d grid(5, 5, 5);
 
-    //print all cells
-    for (int x = 0; x < grid.getWidth(); ++x)
+    //print all cells 
+    for (int z = 0; z < grid.getDepth(); ++z)
     {
         for (int y = 0; y < grid.getHeight(); ++y)
         {
-            for (int z = 0; z < grid.getDepth(); ++z)
+            for (int x = 0; x < grid.getWidth(); ++x)
             {
-				std::cout << "Cell(" << x << ", " << y << ", " << z << ") = " << grid.getCell(x, y, z).X << ", " << grid.getCell(x, y, z).Y << ", " << grid.getCell(x, y, z).Z << std::endl;
+				const auto& cell = grid.getCell(x, y, z);
+				std::cout << "Cell(" << x << ", " << y << ", " << z << ") = (" << cell.X << ", " << cell.Y << ", " << cell.Z << ")" << std::endl;
 			}
 		}
 	}
