@@ -41,6 +41,6 @@ private:
     Tools::Mat4<float> P = Tools::Mat4<float>::projection(m_aspect, m_fov, m_f, m_n);
 
     //Terrain
-    Terrainf terrain;
+    std::unique_ptr<Terrainf> terrain;
 
 };

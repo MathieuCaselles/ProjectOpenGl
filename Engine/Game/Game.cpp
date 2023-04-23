@@ -28,8 +28,6 @@ void Game::run(sf::VideoMode videoMode, std::string windowTitle, sf::Uint32 styl
     if (glewInit())
         throw std::runtime_error("Error");
 
-
-
     m_pCurrentScene->onBeginPlay();
 
     sf::Clock DeltaTimeClock;

@@ -85,8 +85,10 @@ namespace Engine{
 	std::string Shader::readShader(const char* filename)
 	{
 		std::ifstream inputFile(filename);
-		if (!inputFile.is_open())
+		if (!inputFile.is_open()) {
+			std::cout << "Filename can't be opened" << std::endl;
 			throw std::runtime_error("Filename can’t be opened");
+		}
 
 		std::stringstream buffer;
 		buffer << inputFile.rdbuf();
