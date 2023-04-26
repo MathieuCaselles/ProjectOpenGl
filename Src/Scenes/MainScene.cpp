@@ -4,7 +4,7 @@
 
 using Point3f = Tools::Point3d<float>;
 using Mat4f = Tools::Mat4<float>;
-using Terrainf = Engine::Terrain<float>;
+using Terrainf =Terrain<float>;
 
 MainScene::MainScene()
 {

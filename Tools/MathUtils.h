@@ -1,21 +1,50 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <array>
 
 namespace Tools {
-    struct Vector2f
-    {
-        Vector2f(float x, float y) :m_x(x), m_y(y) {};
 
-        float m_x;
-        float m_y;
+    const double PI = 3.14159265358979323846;
+
+    template<typename T>
+    struct Vector2t
+    {
+        explicit Vector2t(const T& _x = 0, const T& _y = 0)
+            : x(_x)
+            , y(_y)
+        {}
+
+
+        inline T dotProduct(const Vector2t& otherVector) const
+        {
+            return x * otherVector.x + y * otherVector.y;
+        }
+
+        inline T dotProduct() const
+        {
+            return x * x + y * y;
+        }
+
+        inline T getNorm() const
+        {
+            return std::sqrt(dotProduct());
+        }
+
+        void normalize()
+        {
+            T length = getNorm();
+            x /= length;
+            y /= length;
+        }
+
+
+
+        T x;
+        T y;
     };
 
-    inline float getDistanceBetween2Points(const Vector2f& point1, const Vector2f& point2)
-    {
-        return sqrtf(powf(point2.m_x - point1.m_x, 2) + powf(point2.m_y - point1.m_y, 2));
-    }
 
 
     template<typename T>
@@ -34,6 +63,8 @@ namespace Tools {
         T x;
         T y;
     };
+
+   
 
     template<typename T>
     struct Point3d
