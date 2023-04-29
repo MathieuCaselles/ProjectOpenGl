@@ -6,6 +6,9 @@ in vec4 iColor;
 in vec3 iWorldNormal;
 in vec3 iWorldPosition;
 
+in vec2 iTexCoord;
+
+
 struct Camera
 {
 	vec3 worldPosition;
@@ -28,6 +31,8 @@ struct DirectionalLight
 uniform Material material;
 uniform DirectionalLight light;
 uniform Camera camera;
+uniform sampler2D texture1;
+
 
 void main()
 {
@@ -39,5 +44,10 @@ void main()
 	vec3 pprime = 2 * h - light.direction;
 	vec3 specular = light.color * pow(max(0, dot(worldEye, pprime)), material.specularSmoothness) * material.specular;
 
-	fragColor = vec4(ambient + diffuse + specular, 1.f);
+	vec4 texColor = texture(texture1, iTexCoord);
+
+	fragColor = vec4(ambient + diffuse + specular, 1.f) + texColor;
+
+	//fragColor = texture(texture1, iTexCoord);
+
 }

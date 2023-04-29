@@ -10,16 +10,53 @@
 #include "Shader.h"
 #include "ProceduralGeneration/PerlinNoise.h"
 
+constexpr float TERRAIN_SIZE = 20;
+
+namespace Engine {
 	template<typename Type>
 	struct vertex_struct_terrain
 	{
-		vertex_struct_terrain(const Tools::Point3d<Type>& p_, const Tools::Point3d<Type>& n_, const Tools::Color<Type>& c_) : p(p_), c(c_), n(n_) {}
+		vertex_struct_terrain(const Tools::Point3d<Type>& p_, const Tools::Point3d<Type>& n_, const Tools::Color<Type>& c_, const Tools::Point2d<Type>& t_) : p(p_), c(c_), n(n_), t(t_) {}
 		Tools::Point3d<Type> p;
 		Tools::Point3d<Type> n;
 
 		Tools::Color<Type> c;
+
+		Tools::Point2d<Type> t;
 		int nb_face = 0;
 
+	};
+
+	struct Texture
+	{
+		Texture()
+		{
+			//std::string path = "C:/Users/Thomas/Desktop/grass.png";
+			std::string path = "C:/Users/Thomas/Desktop/grass.png";
+
+			glGenTextures(1, &m_texture);
+			glBindTexture(GL_TEXTURE_2D, m_texture);
+
+			sf::Image image;
+			image.loadFromFile(path);
+
+			auto size = image.getSize();
+
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
+			glGenerateMipmap(GL_TEXTURE_2D);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
+
+		void bind()
+		{
+			glBindTexture(GL_TEXTURE_2D, m_texture);
+		}
+
+		GLuint m_texture;
 	};
 
 
@@ -123,18 +160,45 @@
 			using vt = vertex_struct_terrain<Type>;
 			std::vector<vertex_struct_terrain<Type>> points;
 
-			generateTerrainVerticesIndices(20, 1);
+			generateTerrainVerticesIndices(TERRAIN_SIZE, 0.1);
+			Tools::Point2d<Type> test{0, 0};
+
+
 
 			for (Tools::Point3d<float>& p : m_vertexVect)
 			{
-				points.push_back(vt{ p, nyp, vg });
+				points.push_back(vt{ p, nyp, vg , test});
 			}
 
+			m_nbVertices = static_cast<GLsizei>(points.size());
+
+			float squareSize = 1.0f / (m_nbVertices / 3);
+
+			for (vertex_struct_terrain<Type>& p : points) {
+
+				// Small texture
+				int xSquare = static_cast<int>((p.p.x + 0.5f) / squareSize);
+				int zSquare = static_cast<int>((p.p.z + 0.5f) / squareSize);
+				p.t = { xSquare * squareSize, zSquare * squareSize };
+
+				// Multiple Medium Texture
+				//p.t = { p.p.x * 0.5f + 0.5f, p.p.z * 0.5f + 0.5f };
+
+				// One big texture
+				//p.t = { (p.p.x - 0) / TERRAIN_SIZE, (p.p.z - 0) / TERRAIN_SIZE };
+			}
+
+
+			unsigned int counter = 0;
 			for (int i = 2; i < m_indices.size(); i += 3) {
+
 				int index = m_indices.at(i);
-				vt& p1 = points.at(m_indices.at(i));
+				vt& p3 = points.at(m_indices.at(i));
 				vt& p2 = points.at(m_indices.at(i - 1));
-				vt& p3 = points.at(m_indices.at(i - 2));
+				vt& p1 = points.at(m_indices.at(i - 2));
+
+				
+				
 
 				//calculate vector
 				Tools::Point3d<Type> vec12 = { p2.p.x - p1.p.x, p2.p.y - p1.p.y, p2.p.z - p1.p.z };
@@ -165,7 +229,7 @@
 
 			}
 
-			m_nbVertices = static_cast<GLsizei>(points.size());
+			
 
 			// Allocate storage size units of OpenGL
 			// Copy data from client to server
@@ -185,9 +249,16 @@
 			glEnableVertexAttribArray(1);
 
 			// En cas de bug penser a changer le décalage par rapport au autres données dans la struct
-			glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_struct_terrain<Type>), (char*)(0) + sizeof(vertex_struct_terrain<Type>::p) + sizeof(vertex_struct_terrain<Type>::n));
+			glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_struct_terrain<Type>), (char*)(0) 
+				+ sizeof(vertex_struct_terrain<Type>::p) 
+				+ sizeof(vertex_struct_terrain<Type>::n));
 			glEnableVertexAttribArray(2);
 
+			glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_struct_terrain<Type>), (char*)(0) 
+				+ sizeof(vertex_struct_terrain<Type>::p)
+				+ sizeof(vertex_struct_terrain<Type>::n)
+				+ sizeof(vertex_struct_terrain<Type>::c));
+			glEnableVertexAttribArray(3);
 
 
 			glGenBuffers(1, &m_elementbuffer);
@@ -217,6 +288,7 @@
 
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
+			m_texture.bind();
 
 			glDrawElements(
 				GL_TRIANGLES,      // mode
@@ -244,6 +316,7 @@
 		std::vector<Tools::Point3d<Type>> m_vertexVect;
 		std::vector<unsigned int> m_indices;
 
+		Texture m_texture;
 		ProceduralGeneration::PerlinNoise<Type> m_perlinNoise;
 
 	};
