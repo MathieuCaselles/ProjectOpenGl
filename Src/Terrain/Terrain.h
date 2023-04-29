@@ -29,16 +29,13 @@ struct vertex_struct_terrain
 
 struct Texture
 {
-	Texture()
+	Texture(std::string path) : m_path(path)
 	{
-		//std::string path = "C:/Users/Thomas/Desktop/grass.png";
-		std::string path = "C:/Users/Thomas/Desktop/grass.png";
-
 		glGenTextures(1, &m_texture);
 		glBindTexture(GL_TEXTURE_2D, m_texture);
 
 		sf::Image image;
-		image.loadFromFile(path);
+		image.loadFromFile(m_path);
 
 		auto size = image.getSize();
 
@@ -56,7 +53,10 @@ struct Texture
 		glBindTexture(GL_TEXTURE_2D, m_texture);
 	}
 
+	
+	std::string m_path;
 	GLuint m_texture;
+
 };
 
 
@@ -197,9 +197,6 @@ public:
 			vt& p2 = points.at(m_indices.at(i - 1));
 			vt& p1 = points.at(m_indices.at(i - 2));
 
-
-
-
 			//calculate vector
 			Tools::Point3d<Type> vec12 = { p2.p.x - p1.p.x, p2.p.y - p1.p.y, p2.p.z - p1.p.z };
 			Tools::Point3d<Type> vec13 = { p3.p.x - p1.p.x, p3.p.y - p1.p.y, p3.p.z - p1.p.z };
@@ -264,6 +261,8 @@ public:
 		glGenBuffers(1, &m_elementbuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), &m_indices[0], GL_STATIC_DRAW);
+
+
 	}
 
 	void render(const Tools::Mat4<Type>& View, const Tools::Mat4<Type>& Projection)
@@ -281,14 +280,29 @@ public:
 		glUniform1f(glGetUniformLocation(m_program, "material.specular"), 1.f);
 		glUniform1f(glGetUniformLocation(m_program, "material.specularSmoothness"), 2.0f);
 
-		glUniform3f(glGetUniformLocation(m_program, "light.direction"), 0.f, -1.f, 0.f);
+		glUniform3f(glGetUniformLocation(m_program, "light.direction"), 0.5f, -0.5f, 0.f);
 		glUniform3f(glGetUniformLocation(m_program, "light.color"), 1.f, 1.f, 1.f);
 
 		glUniform3f(glGetUniformLocation(m_program, "camera.worldPosition"), 0.f, 0.f, 0.f);
 
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
-		m_texture.bind();
+
+		glActiveTexture(GL_TEXTURE0);
+		m_textureGrass.bind();
+
+		glActiveTexture(GL_TEXTURE1);
+		m_textureSnow.bind();
+
+		glActiveTexture(GL_TEXTURE2);
+		m_textureStone.bind();
+
+		GLint texture1Loc = glGetUniformLocation(m_program, "texture1");
+		GLint texture2Loc = glGetUniformLocation(m_program, "texture2");
+		GLint texture3Loc = glGetUniformLocation(m_program, "texture3"); // Revoir le nomage
+		glUniform1i(texture1Loc, 0);
+		glUniform1i(texture2Loc, 1);
+		glUniform1i(texture3Loc, 2);
 
 		glDrawElements(
 			GL_TRIANGLES,      // mode
@@ -320,3 +334,9 @@ private:
 		ProceduralGeneration::PerlinNoise<Type> m_perlinNoise;
 
 	};
+	Texture m_textureGrass = Texture("C:/Users/Thomas/Desktop/grass.png");
+	Texture m_textureSnow = Texture("C:/Users/Thomas/Desktop/snow.png");
+	Texture m_textureStone = Texture("C:/Users/Thomas/Desktop/stone.png");
+
+
+};

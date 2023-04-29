@@ -15,6 +15,8 @@ out vec3 iWorldPosition;
 
 out vec2 iTexCoord;
 
+out float iHeight;
+
 void main()
 {
 	gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vPosition;
@@ -23,4 +25,6 @@ void main()
 	iWorldPosition = (ModelMatrix * vPosition).xyz;
 
 	iTexCoord = vTexCoord;
+
+	iHeight = vPosition.y;
 }
