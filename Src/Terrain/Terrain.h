@@ -7,10 +7,9 @@
 #include <iostream>
 
 #include "Tools/MathUtils.h"
-#include "Engine/Terrain/Shader.h"
+#include "Shader.h"
+#include "ProceduralGeneration/PerlinNoise.h"
 
-
-namespace Engine {
 	template<typename Type>
 	struct vertex_struct_terrain
 	{
@@ -46,21 +45,23 @@ namespace Engine {
 		void generateTerrainVerticesIndices(float size, float step)
 		{
 			int numVertices = static_cast<int>(size / step) + 1;
-			int height = -1;
 
-			for (int i = 0; i < numVertices; i++) {
-				for (int j = 0; j < numVertices; j++) {
+			ProceduralGeneration::PerlinNoise<Type> perlinNoise(size, size);
+
+
+			for (int i = 0; i < numVertices; ++i) {
+				for (int j = 0; j < numVertices; ++j) {
 					Type x = i * step;
 					Type z = j * step;
-					Type y = height;
+					Type y = perlinNoise.compute(x, z);
 					m_vertexVect.push_back(Tools::Point3d<Type>{x, y, z});
 
 				}
 			}
 
 			// Générer les indices pour les triangles
-			for (int i = 0; i < numVertices - 1; i++) {
-				for (int j = 0; j < numVertices - 1; j++) {
+			for (int i = 0; i < numVertices - 1; ++i) {
+				for (int j = 0; j < numVertices - 1; ++j) {
 					// Indices des sommets des deux triangles formant un carré
 					unsigned int index1 = i * numVertices + j;
 					unsigned int index2 = index1 + 1;
@@ -158,8 +159,8 @@ namespace Engine {
 			glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(vertex_struct_terrain<Type>), points.data(), GL_STATIC_DRAW);
 
 			ShaderInfo shaders[] = {
-				{GL_VERTEX_SHADER, "../../../../Engine/Terrain/terrain.vert"}, //Find a better way
-				{GL_FRAGMENT_SHADER, "../../../../Engine/Terrain/terrain.frag"}, //Find a better way
+				{GL_VERTEX_SHADER, "Assets/OpenGl/terrain.vert"}, 
+				{GL_FRAGMENT_SHADER, "Assets/OpenGl/terrain.frag"}, 
 				{GL_NONE, nullptr}
 			};
 
@@ -229,5 +230,5 @@ namespace Engine {
 		GLuint m_elementbuffer;
 		std::vector<Tools::Point3d<Type>> m_vertexVect;
 		std::vector<unsigned int> m_indices;
+
 	};
-}
