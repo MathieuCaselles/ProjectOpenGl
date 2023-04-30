@@ -1,5 +1,6 @@
 cmake_minimum_required (VERSION 3.8)
 
+file(REMOVE_RECURSE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Assets)
 file(COPY ${CMAKE_CURRENT_LIST_DIR}/Assets DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 add_executable(ProjectOpenGl)
