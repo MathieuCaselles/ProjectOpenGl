@@ -13,7 +13,7 @@ namespace ProceduralGeneration {
 
     public:
         //  Definition of the gradient grid
-        explicit PerlinNoise(int seed = 1337) : m_grid(seed), m_frequency(1.0f)
+        explicit PerlinNoise(int seed = 666) : m_grid(seed), m_frequency(1.0f)
         {
         }
 
