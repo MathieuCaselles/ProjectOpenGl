@@ -42,18 +42,31 @@
 		//void GenerateVertex();
 		//void GenerateIndices();
 
-		void generateTerrainVerticesIndices(float size, float step)
+		void generateTerrainVerticesIndices(int size, float step)
 		{
 			int numVertices = static_cast<int>(size / step) + 1;
 
-			ProceduralGeneration::PerlinNoise<Type> perlinNoise(size, size);
+			m_perlinNoise.setFrequency(7);
+
+			const Type width = numVertices;
+			const Type height = numVertices;
+
+			std::vector<std::vector<Type>> heightmap(width, std::vector<Type>(height));
+
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					Type nx = static_cast<Type>(x) / static_cast<Type>(width) - static_cast<Type>(0.5f);
+					Type ny = static_cast<Type>(y) / static_cast<Type>(height) - static_cast<Type>(0.5f);
+					heightmap[y][x] = m_perlinNoise.compute(nx, ny) * 10; // todo: no hardcord magic value to increase height of noise
+				}
+			}
 
 
 			for (int i = 0; i < numVertices; ++i) {
 				for (int j = 0; j < numVertices; ++j) {
 					Type x = i * step;
 					Type z = j * step;
-					Type y = perlinNoise.compute(x, z);
+					Type y = heightmap[z][x];
 					m_vertexVect.push_back(Tools::Point3d<Type>{x, y, z});
 
 				}
@@ -110,7 +123,7 @@
 			using vt = vertex_struct_terrain<Type>;
 			std::vector<vertex_struct_terrain<Type>> points;
 
-			generateTerrainVerticesIndices(20, 0.01);
+			generateTerrainVerticesIndices(20, 1);
 
 			for (Tools::Point3d<float>& p : m_vertexVect)
 			{
@@ -230,5 +243,7 @@
 		GLuint m_elementbuffer;
 		std::vector<Tools::Point3d<Type>> m_vertexVect;
 		std::vector<unsigned int> m_indices;
+
+		ProceduralGeneration::PerlinNoise<Type> m_perlinNoise;
 
 	};
