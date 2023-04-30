@@ -53,7 +53,7 @@ struct Texture
 		glBindTexture(GL_TEXTURE_2D, m_texture);
 	}
 
-	
+
 	std::string m_path;
 	GLuint m_texture;
 
@@ -74,6 +74,7 @@ public:
 	{
 		glDeleteVertexArrays(1, &m_vao);
 		glDeleteBuffers(1, &m_vbo);
+		glDeleteBuffers(1, &m_elementbuffer);
 	}
 
 	//void GenerateVertex();
@@ -189,7 +190,6 @@ public:
 		}
 
 
-		unsigned int counter = 0;
 		for (int i = 2; i < m_indices.size(); i += 3) {
 
 			int index = m_indices.at(i);
@@ -209,17 +209,17 @@ public:
 				(vec12.y * vec13.x) - (vec12.x * vec13.y)
 			};
 
-			p1.n = ((p1.n * p1.nb_face) + normal) / (p1.nb_face + 1);
+			p1.n = ((p1.n * p1.nb_face) + normal) / (p1.nb_face);
 			p1.n = p1.n / std::sqrt((p1.n.x * p1.n.x) + (p1.n.y * p1.n.y) + (p1.n.z * p1.n.z));
 
 			p1.nb_face += 1;
 
-			p2.n = ((p2.n * p2.nb_face) + normal) / (p2.nb_face + 1);
+			p2.n = ((p2.n * p2.nb_face) + normal) / (p2.nb_face);
 			p2.n = p2.n / std::sqrt((p2.n.x * p2.n.x) + (p2.n.y * p2.n.y) + (p2.n.z * p2.n.z));
 
 			p2.nb_face += 1;
 
-			p3.n = ((p3.n * p3.nb_face) + normal) / (p3.nb_face + 1);
+			p3.n = ((p3.n * p3.nb_face) + normal) / (p3.nb_face);
 			p3.n = p3.n / std::sqrt((p3.n.x * p3.n.x) + (p3.n.y * p3.n.y) + (p3.n.z * p3.n.z));
 
 			p3.nb_face += 1;
@@ -275,12 +275,12 @@ public:
 		glUniformMatrix4fv(glGetUniformLocation(m_program, "ViewMatrix"), 1, GL_FALSE, View.getData());
 		glUniformMatrix4fv(glGetUniformLocation(m_program, "ProjectionMatrix"), 1, GL_FALSE, Projection.getData());
 
-		glUniform1f(glGetUniformLocation(m_program, "material.ambient"), 0.3f);
+		glUniform1f(glGetUniformLocation(m_program, "material.ambient"), 0.2f);
 		glUniform1f(glGetUniformLocation(m_program, "material.diffuse"), 0.7f);
 		glUniform1f(glGetUniformLocation(m_program, "material.specular"), 1.f);
-		glUniform1f(glGetUniformLocation(m_program, "material.specularSmoothness"), 2.0f);
+		glUniform1f(glGetUniformLocation(m_program, "material.specularSmoothness"), 1.0f);
 
-		glUniform3f(glGetUniformLocation(m_program, "light.direction"), 0.5f, -0.5f, 0.f);
+		glUniform3f(glGetUniformLocation(m_program, "light.direction"), 0.5f, 0.5f, 0.f);
 		glUniform3f(glGetUniformLocation(m_program, "light.color"), 1.f, 1.f, 1.f);
 
 		glUniform3f(glGetUniformLocation(m_program, "camera.worldPosition"), 0.f, 0.f, 0.f);
@@ -334,9 +334,9 @@ private:
 		ProceduralGeneration::PerlinNoise<Type> m_perlinNoise;
 
 	};
-	Texture m_textureGrass = Texture("C:/Users/Thomas/Desktop/grass.png");
-	Texture m_textureSnow = Texture("C:/Users/Thomas/Desktop/snow.png");
-	Texture m_textureStone = Texture("C:/Users/Thomas/Desktop/stone.png");
+	Texture m_textureGrass = Texture("Assets/Textures/grass.png");
+	Texture m_textureSnow = Texture("Assets/Textures/snow.png");
+	Texture m_textureStone = Texture("Assets/Textures/stone.png");
 
 
 };

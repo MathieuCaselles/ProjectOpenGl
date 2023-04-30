@@ -39,10 +39,7 @@ uniform sampler2D texture3;
 
 
 void main()
-{
-	vec3 ambient = material.ambient * iColor.rgb;
-	vec3 diffuse = max(0, -dot(iWorldNormal, light.direction)) * light.color * iColor.rgb;
-	
+{	
 	vec3 worldEye = normalize(iWorldPosition - camera.worldPosition);
 	vec3 h = dot(iWorldNormal, light.direction) * iWorldNormal;
 	vec3 pprime = 2 * h - light.direction;
@@ -53,7 +50,7 @@ void main()
 	vec4 texColor3 = texture(texture3, iTexCoord);
 
 
-	    vec4 color = vec4(0.0);
+	vec4 color = vec4(0.0);
 
     if (iHeight > 0.5) {
         color = mix(texColor2, texColor3, (iHeight - 0.5) / 0.7);
@@ -62,6 +59,10 @@ void main()
     } else {
         color = texColor1;
     }
+
+	vec3 ambient = material.ambient * color.rgb;
+	vec3 diffuse = max(0, -dot(iWorldNormal, light.direction)) * light.color * color.rgb;
+
 	fragColor = vec4(ambient + diffuse + specular, 1.f) + color;
 
 }
