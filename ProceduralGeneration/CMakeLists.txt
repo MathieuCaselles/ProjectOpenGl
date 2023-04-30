@@ -13,4 +13,5 @@ target_include_directories(ProceduralGeneration PUBLIC
 
 target_sources(ProceduralGeneration PRIVATE
    "PerlinNoise.h" "PerlinNoise.cpp"
- "Grid2d.h")
+    "PerlinGrid2d.h"
+)
