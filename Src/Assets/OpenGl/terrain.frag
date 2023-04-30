@@ -52,10 +52,12 @@ void main()
 
 	vec4 color = vec4(0.0);
 
-    if (iHeight > 0.5) {
-        color = mix(texColor2, texColor3, (iHeight - 0.5) / 0.7);
-    } else if (iHeight > 0.1) {
-        color = mix(texColor1, texColor2, (iHeight - 0.1) / 0.2);
+	// Changer en stone quand la normal a un certains angle ?
+
+    if (iHeight > 6) {
+        color = mix(texColor3, texColor2, smoothstep(6.0, 7.0, iHeight));
+    } else if (iHeight > 0.5) {
+        color = mix(texColor1, texColor3, smoothstep(0.5, 2.0, iHeight));
     } else {
         color = texColor1;
     }

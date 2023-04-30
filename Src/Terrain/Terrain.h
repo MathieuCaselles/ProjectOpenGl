@@ -10,7 +10,7 @@
 #include "Shader.h"
 #include "ProceduralGeneration/PerlinNoise.h"
 
-constexpr float TERRAIN_SIZE = 20;
+constexpr float TERRAIN_SIZE = 200;
 
 
 template<typename Type>
@@ -84,7 +84,7 @@ public:
 		{
 			int numVertices = static_cast<int>(size / step) + 1;
 
-			m_perlinNoise.setFrequency(7);
+			m_perlinNoise.setFrequency(20);
 
 			const Type width = numVertices;
 			const Type height = numVertices;
@@ -95,7 +95,7 @@ public:
 				for (int x = 0; x < width; x++) {
 					Type nx = static_cast<Type>(x) / static_cast<Type>(width) - static_cast<Type>(0.5f);
 					Type ny = static_cast<Type>(y) / static_cast<Type>(height) - static_cast<Type>(0.5f);
-					heightmap[y][x] = m_perlinNoise.compute(nx, ny) * 10; // todo: no hardcord magic value to increase height of noise
+					heightmap[y][x] = m_perlinNoise.compute(nx, ny) * 20; // todo: no hardcord magic value to increase height of noise
 				}
 			}
 
@@ -161,7 +161,7 @@ public:
 		using vt = vertex_struct_terrain<Type>;
 		std::vector<vertex_struct_terrain<Type>> points;
 
-		generateTerrainVerticesIndices(TERRAIN_SIZE, 0.1);
+		generateTerrainVerticesIndices(TERRAIN_SIZE, 1);
 		Tools::Point2d<Type> test{ 0, 0 };
 
 
@@ -330,13 +330,13 @@ private:
 	std::vector<Tools::Point3d<Type>> m_vertexVect;
 	std::vector<unsigned int> m_indices;
 
-		Texture m_texture;
-		ProceduralGeneration::PerlinNoise<Type> m_perlinNoise;
+	ProceduralGeneration::PerlinNoise<Type> m_perlinNoise;
 
-	};
 	Texture m_textureGrass = Texture("Assets/Textures/grass.png");
 	Texture m_textureSnow = Texture("Assets/Textures/snow.png");
 	Texture m_textureStone = Texture("Assets/Textures/stone.png");
+	//Texture m_textureStone = Texture("C:/Users/Thomas/Desktop/testTexture.png");
+
 
 
 };
