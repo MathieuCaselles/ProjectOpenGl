@@ -37,6 +37,8 @@ uniform sampler2D texture2;
 uniform sampler2D texture3;
 
 
+float snowHeight = 12.0;
+float stoneAngle = 60.0;
 
 void main()
 {	
@@ -51,16 +53,18 @@ void main()
 
 
 	vec4 color = vec4(0.0);
+	float angle = degrees(acos(dot(iWorldNormal, vec3(0, -1, 0))));
 
-	// Changer en stone quand la normal a un certains angle ?
+	if (angle > stoneAngle && iHeight < snowHeight) {
+		color = texColor3;
+	} else {
+		if (iHeight > snowHeight) {
+			color = mix(texColor3, texColor2, smoothstep(snowHeight, snowHeight + 4, iHeight));
+		} else {
+			color = texColor1;
+		}
+	}
 
-    if (iHeight > 6) {
-        color = mix(texColor3, texColor2, smoothstep(6.0, 7.0, iHeight));
-    } else if (iHeight > 0.5) {
-        color = mix(texColor1, texColor3, smoothstep(0.5, 2.0, iHeight));
-    } else {
-        color = texColor1;
-    }
 
 	vec3 ambient = material.ambient * color.rgb;
 	vec3 diffuse = max(0, -dot(iWorldNormal, light.direction)) * light.color * color.rgb;
