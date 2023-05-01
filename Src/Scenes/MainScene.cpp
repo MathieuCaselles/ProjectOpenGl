@@ -6,9 +6,8 @@ using Point3f = Tools::Point3d<float>;
 using Mat4f = Tools::Mat4<float>;
 using Terrainf =Terrain<float>;
 
-MainScene::MainScene()
+MainScene::MainScene(): m_aspect(800.f / 600.f), m_fov(45.f / 180.f * Tools::PI), m_n(0.1f), m_f(2000.f), m_cameraPos(0.f, 50.f, 0.f), m_cameraAlpha(-2.50f), m_cameraBeta(0.25f), m_cameraSpeed(1.f)
 {
-
 }
 
 MainScene::~MainScene()
@@ -16,14 +15,9 @@ MainScene::~MainScene()
 }
 
 void MainScene::onBeginPlay() {
-	m_cameraAlpha = 0.f; // YAW
-	m_cameraBeta = 0.f; // PITCH
-	m_cameraSpeed = 0.05f;
-
 	sf::Mouse::setPosition(sf::Vector2i(400, 300), m_window);
 
     terrain = std::make_unique<Terrainf>();
-
 }
 
 void MainScene::processInput(sf::Event& inputEvent)
@@ -38,6 +32,8 @@ void MainScene::processInput(sf::Event& inputEvent)
         m_cameraAlpha += 0.001f * dx;
         m_cameraBeta -= 0.001f * dy;
     }
+
+    printf("Camera position: %f, %f\n", m_cameraAlpha, m_cameraBeta);
 		
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
     {

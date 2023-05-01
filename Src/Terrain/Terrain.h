@@ -10,7 +10,7 @@
 #include "Shader.h"
 #include "ProceduralGeneration/PerlinNoise.h"
 
-constexpr float TERRAIN_SIZE = 200;
+constexpr float TERRAIN_SIZE = 1000;
 
 
 template<typename Type>
@@ -82,9 +82,12 @@ public:
 
 		void generateTerrainVerticesIndices(int size, float step)
 		{
-			int numVertices = static_cast<int>(size / step) + 1;
+			const int numVertices = static_cast<int>(size / step) + 1;
 
-			m_perlinNoise.setFrequency(20);
+			m_perlinNoise.setFrequency(5);
+			m_perlinNoise.setAmplitude(18);
+			m_perlinNoise.setOctaves(4);
+			m_perlinNoise.setExponent(3.5);
 
 			const Type width = numVertices;
 			const Type height = numVertices;
@@ -93,18 +96,18 @@ public:
 
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
-					Type nx = static_cast<Type>(x) / static_cast<Type>(width) - static_cast<Type>(0.5f);
-					Type ny = static_cast<Type>(y) / static_cast<Type>(height) - static_cast<Type>(0.5f);
-					heightmap[y][x] = m_perlinNoise.compute(nx, ny) * 20; // todo: no hardcord magic value to increase height of noise
+					const Type nx = static_cast<Type>(x) / static_cast<Type>(width) - static_cast<Type>(0.5f);
+					const Type ny = static_cast<Type>(y) / static_cast<Type>(height) - static_cast<Type>(0.5f);
+					heightmap[y][x] = m_perlinNoise.compute(nx, ny); // todo: no hardcord magic value to increase height of noise
 				}
 			}
 
 
 			for (int i = 0; i < numVertices; ++i) {
 				for (int j = 0; j < numVertices; ++j) {
-					Type x = i * step;
-					Type z = j * step;
-					Type y = heightmap[z][x];
+					const Type x = i * step;
+					const Type z = j * step;
+					const Type y = heightmap[z][x] - 15;
 					m_vertexVect.push_back(Tools::Point3d<Type>{x, y, z});
 
 			}
@@ -114,10 +117,10 @@ public:
 		for (int i = 0; i < numVertices - 1; ++i) {
 			for (int j = 0; j < numVertices - 1; ++j) {
 				// Indices des sommets des deux triangles formant un carré
-				unsigned int index1 = i * numVertices + j;
-				unsigned int index2 = index1 + 1;
-				unsigned int index3 = (i + 1) * numVertices + j;
-				unsigned int index4 = index3 + 1;
+				const unsigned int index1 = i * numVertices + j;
+				const unsigned int index2 = index1 + 1;
+				const unsigned int index3 = (i + 1) * numVertices + j;
+				const unsigned int index4 = index3 + 1;
 
 				// Premier triangle
 				m_indices.push_back(index1);
@@ -173,7 +176,7 @@ public:
 
 		m_nbVertices = static_cast<GLsizei>(points.size());
 
-		float squareSize = 1.0f / (m_nbVertices / 3);
+		const float squareSize = 1.0f / (m_nbVertices / 3);
 
 		for (vertex_struct_terrain<Type>& p : points) {
 

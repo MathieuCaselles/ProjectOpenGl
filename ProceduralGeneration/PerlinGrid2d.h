@@ -19,7 +19,7 @@ public:
 		setPermutationTable(seed);
 	};
 
-	inline Type getGradientDotProduct(int x, int y, Type distanceX, Type distanceY) const
+	inline const Type& getGradientDotProduct(const int& x, const int& y, const Type& distanceX, const Type& distanceY) const
 	{
 		const Type gradientX[] =
 		{
@@ -63,7 +63,7 @@ private:
 		}
 	}
 
-	inline unsigned char getPermutedIndex(int x, int y) const
+	inline const unsigned char& getPermutedIndex(const int& x, const int& y) const
 	{
 		// "& 0xff" means that the number is "masked" by using the "and" operator with the hexadecimal value 0xff (which is 255 in decimal). 
 		// This ensures that the number is between 0 and 255, as it removes all bits beyond the eighth bit.

@@ -33,10 +33,10 @@ private:
 
     Mat4f V;
 
-    const float m_aspect = 800.f / 600.f;
-    const float m_fov = 45.f / 180.f * 3.141592f;
-    const float m_n = 0.1f;
-    const float m_f = 100.f;
+    const float m_aspect;
+    const float m_fov;
+    const float m_n;
+    const float m_f;
 
     Tools::Mat4<float> P = Tools::Mat4<float>::projection(m_aspect, m_fov, m_f, m_n);
 
