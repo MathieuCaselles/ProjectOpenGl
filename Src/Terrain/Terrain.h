@@ -9,6 +9,7 @@
 #include "Tools/MathUtils.h"
 #include "Shader.h"
 #include "ProceduralGeneration/PerlinNoise.h"
+#include "Texture.h"
 
 constexpr float TERRAIN_SIZE = 1000;
 
@@ -24,38 +25,6 @@ struct vertex_struct_terrain
 
 	Tools::Point2d<Type> t;
 	int nb_face = 0;
-
-};
-
-struct Texture
-{
-	Texture(std::string path) : m_path(path)
-	{
-		glGenTextures(1, &m_texture);
-		glBindTexture(GL_TEXTURE_2D, m_texture);
-
-		sf::Image image;
-		image.loadFromFile(m_path);
-
-		auto size = image.getSize();
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixelsPtr());
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	}
-
-	void bind()
-	{
-		glBindTexture(GL_TEXTURE_2D, m_texture);
-	}
-
-
-	std::string m_path;
-	GLuint m_texture;
 
 };
 
@@ -76,9 +45,6 @@ public:
 		glDeleteBuffers(1, &m_vbo);
 		glDeleteBuffers(1, &m_elementbuffer);
 	}
-
-	//void GenerateVertex();
-	//void GenerateIndices();
 
 		void generateTerrainVerticesIndices(int size, float step)
 		{
@@ -102,7 +68,7 @@ public:
 				}
 			}
 
-
+			// Vertices
 			for (int i = 0; i < numVertices; ++i) {
 				for (int j = 0; j < numVertices; ++j) {
 					const Type x = i * step;
@@ -113,10 +79,10 @@ public:
 			}
 		}
 
-		// Générer les indices pour les triangles
+		// Indices
 		for (int i = 0; i < numVertices - 1; ++i) {
 			for (int j = 0; j < numVertices - 1; ++j) {
-				// Indices des sommets des deux triangles formant un carré
+
 				const unsigned int index1 = i * numVertices + j;
 				const unsigned int index2 = index1 + 1;
 				const unsigned int index3 = (i + 1) * numVertices + j;
@@ -137,37 +103,20 @@ public:
 
 	void load()
 	{
-		// We want only one buffer with the id generated and stored in m_vao
 		glGenVertexArrays(1, &m_vao);
-
-		// create a new active VAO
 		glBindVertexArray(m_vao);
 
-		// we want only one buffer with the id generated and stored in m_vbo
 		glGenBuffers(1, &m_vbo);
-
-		// 1. create a new active VBO if doesn’t exist
-		// 2. if the VBO is active it will make it active
-		// 3. if binded to 0, OpenGL stops
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-		Tools::Point3d<Type> P000 = { -1, -1, -1 }; Tools::Point3d<Type> P001 = { -1, -1, +1 }; Tools::Point3d<Type> P010 = { -1, +1, -1 }; Tools::Point3d<Type> P011 = { -1, +1, +1 };
-		Tools::Point3d<Type> P100 = { +1, -1, -1 }; Tools::Point3d<Type> P101 = { +1, -1, +1 }; Tools::Point3d<Type> P110 = { +1, +1, -1 }; Tools::Point3d<Type> P111 = { +1, +1, +1 };
-
-		Tools::Color<Type> vr = { 1, 0, 0, 1 }; Tools::Color<Type> vg = { 0, 1, 0, 1 }; Tools::Color<Type> vb = { 0, 0, 1, 1 };
-		Tools::Color<Type> ar = { 0, 1, 1, 1 }; Tools::Color<Type> ag = { 1, 0, 1, 1 }; Tools::Color<Type> ab = { 1, 1, 0, 1 };
-
-		Tools::Point3d<Type> nxn = { -1, 0, 0 }; Tools::Point3d<Type> nxp = { +1, 0, 0 };
-		Tools::Point3d<Type> nyn = { 0, -1, 0 }; Tools::Point3d<Type> nyp = { 0, +1, 0 };
-		Tools::Point3d<Type> nzn = { 0, 0, -1 }; Tools::Point3d<Type> nzp = { 0, 0, +1 };
+		Tools::Color<Type> vg = { 0, 1, 0, 1 };
+		Tools::Point3d<Type> nyp = { 0, +1, 0 };
 
 		using vt = vertex_struct_terrain<Type>;
 		std::vector<vertex_struct_terrain<Type>> points;
 
 		generateTerrainVerticesIndices(TERRAIN_SIZE, 1);
 		Tools::Point2d<Type> test{ 0, 0 };
-
-
 
 		for (Tools::Point3d<float>& p : m_vertexVect)
 		{
@@ -180,16 +129,9 @@ public:
 
 		for (vertex_struct_terrain<Type>& p : points) {
 
-			// Small texture
 			int xSquare = static_cast<int>((p.p.x + 0.5f) / squareSize);
 			int zSquare = static_cast<int>((p.p.z + 0.5f) / squareSize);
 			p.t = { xSquare * squareSize, zSquare * squareSize };
-
-			// Multiple Medium Texture
-			//p.t = { p.p.x * 0.5f + 0.5f, p.p.z * 0.5f + 0.5f };
-
-			// One big texture
-			//p.t = { (p.p.x - 0) / TERRAIN_SIZE, (p.p.z - 0) / TERRAIN_SIZE };
 		}
 
 
@@ -200,11 +142,10 @@ public:
 			vt& p2 = points.at(m_indices.at(i - 1));
 			vt& p1 = points.at(m_indices.at(i - 2));
 
-			//calculate vector
 			Tools::Point3d<Type> vec12 = { p2.p.x - p1.p.x, p2.p.y - p1.p.y, p2.p.z - p1.p.z };
 			Tools::Point3d<Type> vec13 = { p3.p.x - p1.p.x, p3.p.y - p1.p.y, p3.p.z - p1.p.z };
 
-			//Calculate normal
+			//Calcul de la normal
 			Tools::Point3d<Type> normal =
 			{
 				(vec12.z * vec13.y) - (vec12.y * vec13.z),
@@ -229,11 +170,7 @@ public:
 
 		}
 
-
-
-		// Allocate storage size units of OpenGL
-		// Copy data from client to server
-		glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(vertex_struct_terrain<Type>), points.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_terrain<Type>), points.data(), GL_STATIC_DRAW);
 
 		ShaderInfo shaders[] = {
 			{GL_VERTEX_SHADER, "Assets/OpenGl/terrain.vert"},
@@ -248,7 +185,6 @@ public:
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_struct_terrain<Type>), (char*)(0) + sizeof(vertex_struct_terrain<Type>::p));
 		glEnableVertexAttribArray(1);
 
-		// En cas de bug penser a changer le décalage par rapport au autres données dans la struct
 		glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(vertex_struct_terrain<Type>), (char*)(0)
 			+ sizeof(vertex_struct_terrain<Type>::p)
 			+ sizeof(vertex_struct_terrain<Type>::n));
@@ -270,6 +206,8 @@ public:
 
 	void render(const Tools::Mat4<Type>& View, const Tools::Mat4<Type>& Projection)
 	{
+		glUseProgram(m_program);
+
 		glBindVertexArray(m_vao);
 
 		Tools::Mat4<Type> Model = Tools::Mat4<Type>::translation(0, 0, -5) * Tools::Mat4<Type>::rotationY(m_angleY) * Tools::Mat4<Type>::rotationX(m_angleX);
@@ -317,8 +255,6 @@ public:
 
 	void update()
 	{
-		/*m_angleX += 0.0125f;
-		m_angleY += 0.025f;*/
 	}
 
 private:

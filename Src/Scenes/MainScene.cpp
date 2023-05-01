@@ -5,6 +5,7 @@
 using Point3f = Tools::Point3d<float>;
 using Mat4f = Tools::Mat4<float>;
 using Terrainf =Terrain<float>;
+using Waterf = Water<float>;
 
 MainScene::MainScene(): m_aspect(800.f / 600.f), m_fov(45.f / 180.f * Tools::PI), m_n(0.1f), m_f(2000.f), m_cameraPos(0.f, 50.f, 0.f), m_cameraAlpha(-2.50f), m_cameraBeta(0.25f), m_cameraSpeed(1.f)
 {
@@ -18,6 +19,7 @@ void MainScene::onBeginPlay() {
 	sf::Mouse::setPosition(sf::Vector2i(400, 300), m_window);
 
     terrain = std::make_unique<Terrainf>();
+    water = std::make_unique<Waterf>();
 }
 
 void MainScene::processInput(sf::Event& inputEvent)
@@ -74,11 +76,14 @@ void MainScene::update(const float& deltaTime)
     V = Mat4f::rotationX(-m_cameraBeta) * Mat4f::rotationY(-m_cameraAlpha) * Mat4f::translation(-m_cameraPos.x, -m_cameraPos.y, -m_cameraPos.z);
 
     terrain->update();
+    water->update();
 }
 
 void MainScene::render()
 {
     terrain->render(V, P);
+    water->render(V, P);
+
     glFlush();
     //Ui render i guess
 }

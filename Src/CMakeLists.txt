@@ -20,4 +20,6 @@ target_sources(ProjectOpenGl PRIVATE
 
     "Terrain/Terrain.h"
     "Terrain/Shader.h" "Terrain/Shader.cpp"
+    "Terrain/Water.h" "Terrain/Texture.h"
+
 )
