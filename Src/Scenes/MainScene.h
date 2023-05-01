@@ -2,13 +2,15 @@
 
 #include <Engine/Scene/Scene.h>
 
-#include "../Terrain/Terrain.h"
+#include "Src/Terrain/Terrain.h"
+#include "Src/Terrain/Water.h"
 
 //Aliases declaration
 
 using Point3f = Tools::Point3d<float>;
 using Mat4f = Tools::Mat4<float>;
 using Terrainf = Terrain<float>;
+using Waterf = Water<float>;
 
 class MainScene : public Engine::IScene
 {
@@ -42,5 +44,6 @@ private:
 
     //Terrain
     std::unique_ptr<Terrainf> terrain;
+    std::unique_ptr<Waterf> water;
 
 };
