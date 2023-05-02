@@ -16,7 +16,7 @@ class PerlinGrid2d {
 public:
 	PerlinGrid2d(const int seed)
 	{
-		setPermutationTable(seed);
+		setSeed(seed);
 	};
 
 	inline const Type& getGradientDotProduct(const int& x, const int& y, const Type& distanceX, const Type& distanceY) const
@@ -39,13 +39,17 @@ public:
 		return distanceX * gradientX[permutedIndex] + distanceY * gradientY[permutedIndex];
 	}
 
-
-private:
-	inline void setPermutationTable(const int seed)
+	inline void setSeed(const int seed)
 	{
 		m_seed = seed;
+		setPermutationTable();
+	}
 
-		std::mt19937_64 gen(seed);
+
+private:
+	inline void setPermutationTable()
+	{
+		std::mt19937_64 gen(m_seed);
 
 		for (int i = 0; i < 256; ++i)
 			m_permutationTable[i] = i;

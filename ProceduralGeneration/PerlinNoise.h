@@ -57,6 +57,11 @@ namespace ProceduralGeneration {
             m_exponent = exponent;
         };
 
+        inline void setSeed(const int seed)
+        {
+            m_grid.setSeed(seed);
+        }
+
     private:
         inline const Type& getPerlinNoise2d(const Type& x, const Type& y)
         {
