@@ -35,8 +35,6 @@ void MainScene::processInput(sf::Event& inputEvent)
         m_cameraBeta -= 0.001f * dy;
     }
 
-    printf("Camera position: %f, %f\n", m_cameraAlpha, m_cameraBeta);
-		
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
     {
         m_cameraPos.x -= sin(m_cameraAlpha) * m_cameraSpeed;
