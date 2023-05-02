@@ -12,6 +12,8 @@
 #include "Texture.h"
 
 constexpr float TERRAIN_SIZE = 1000;
+constexpr float TERRAIN_STEP = 1;
+
 
 
 template<typename Type>
@@ -32,6 +34,8 @@ struct vertex_struct_terrain
 template<typename Type>
 class Terrain
 {
+	using vt = vertex_struct_terrain<Type>;
+
 public:
 
 	Terrain()
@@ -46,35 +50,35 @@ public:
 		glDeleteBuffers(1, &m_elementbuffer);
 	}
 
-		void generateTerrainVerticesIndices(int size, float step)
-		{
-			const int numVertices = static_cast<int>(size / step) + 1;
+	void generateTerrainVerticesIndices(int size, float step)
+	{
+		const int numVertices = static_cast<int>(size / step) + 1;
 
-			m_perlinNoise.setFrequency(5);
-			m_perlinNoise.setAmplitude(18);
-			m_perlinNoise.setOctaves(4);
-			m_perlinNoise.setExponent(3.5);
+		m_perlinNoise.setFrequency(5);
+		m_perlinNoise.setAmplitude(18);
+		m_perlinNoise.setOctaves(4);
+		m_perlinNoise.setExponent(3.5);
 
-			const Type width = numVertices;
-			const Type height = numVertices;
+		const Type width = numVertices;
+		const Type height = numVertices;
 
-			std::vector<std::vector<Type>> heightmap(width, std::vector<Type>(height));
+		std::vector<std::vector<Type>> heightmap(width, std::vector<Type>(height));
 
-			for (int y = 0; y < height; y++) {
-				for (int x = 0; x < width; x++) {
-					const Type nx = static_cast<Type>(x) / static_cast<Type>(width) - static_cast<Type>(0.5f);
-					const Type ny = static_cast<Type>(y) / static_cast<Type>(height) - static_cast<Type>(0.5f);
-					heightmap[y][x] = m_perlinNoise.compute(nx, ny); // todo: no hardcord magic value to increase height of noise
-				}
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				const Type nx = static_cast<Type>(x) / static_cast<Type>(width) - static_cast<Type>(0.5f);
+				const Type ny = static_cast<Type>(y) / static_cast<Type>(height) - static_cast<Type>(0.5f);
+				heightmap[y][x] = m_perlinNoise.compute(nx, ny); // todo: no hardcord magic value to increase height of noise
 			}
+		}
 
-			// Vertices
-			for (int i = 0; i < numVertices; ++i) {
-				for (int j = 0; j < numVertices; ++j) {
-					const Type x = i * step;
-					const Type z = j * step;
-					const Type y = heightmap[z][x] - 15;
-					m_vertexVect.push_back(Tools::Point3d<Type>{x, y, z});
+		// Vertices
+		for (int i = 0; i < numVertices; ++i) {
+			for (int j = 0; j < numVertices; ++j) {
+				const Type x = i * step;
+				const Type z = j * step;
+				const Type y = heightmap[z][x] - 15;
+				m_vertexVect.push_back(Tools::Point3d<Type>{x, y, z});
 
 			}
 		}
@@ -101,6 +105,82 @@ public:
 		}
 	}
 
+	void reloadHeight() {
+
+
+		glBindVertexArray(m_vao);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+
+		const int numVertices = static_cast<int>(TERRAIN_SIZE / TERRAIN_STEP) + 1;
+
+		m_perlinNoise.setSeed(251); // Changer la seed dans les Ui en passant en parametre de cette méthode
+
+		m_perlinNoise.setFrequency(5);
+		m_perlinNoise.setAmplitude(18);
+		m_perlinNoise.setOctaves(4);
+		m_perlinNoise.setExponent(3.5);
+
+		const Type width = numVertices;
+		const Type height = numVertices;
+
+		std::vector<std::vector<Type>> heightmap(width, std::vector<Type>(height));
+
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				const Type nx = static_cast<Type>(x) / static_cast<Type>(width) - static_cast<Type>(0.5f);
+				const Type ny = static_cast<Type>(y) / static_cast<Type>(height) - static_cast<Type>(0.5f);
+				heightmap[y][x] = m_perlinNoise.compute(nx, ny); // todo: no hardcord magic value to increase height of noise
+			}
+		}
+
+		for (vertex_struct_terrain<Type>& p : points) {
+
+			p.p.y = heightmap[p.p.z][p.p.x] - 15;
+		}
+
+		for (int i = 2; i < m_indices.size(); i += 3) {
+
+			int index = m_indices.at(i);
+			vt& p3 = points.at(m_indices.at(i));
+			vt& p2 = points.at(m_indices.at(i - 1));
+			vt& p1 = points.at(m_indices.at(i - 2));
+
+			Tools::Point3d<Type> vec12 = { p2.p.x - p1.p.x, p2.p.y - p1.p.y, p2.p.z - p1.p.z };
+			Tools::Point3d<Type> vec13 = { p3.p.x - p1.p.x, p3.p.y - p1.p.y, p3.p.z - p1.p.z };
+
+			Tools::Point3d<Type> normal =
+			{
+				(vec12.z * vec13.y) - (vec12.y * vec13.z),
+				(vec12.x * vec13.z) - (vec12.z * vec13.x),
+				(vec12.y * vec13.x) - (vec12.x * vec13.y)
+			};
+
+			p1.n = ((p1.n * p1.nb_face) + normal) / (p1.nb_face);
+			p1.n = p1.n / std::sqrt((p1.n.x * p1.n.x) + (p1.n.y * p1.n.y) + (p1.n.z * p1.n.z));
+
+			p1.nb_face += 1;
+
+			p2.n = ((p2.n * p2.nb_face) + normal) / (p2.nb_face);
+			p2.n = p2.n / std::sqrt((p2.n.x * p2.n.x) + (p2.n.y * p2.n.y) + (p2.n.z * p2.n.z));
+
+			p2.nb_face += 1;
+
+			p3.n = ((p3.n * p3.nb_face) + normal) / (p3.nb_face);
+			p3.n = p3.n / std::sqrt((p3.n.x * p3.n.x) + (p3.n.y * p3.n.y) + (p3.n.z * p3.n.z));
+
+			p3.nb_face += 1;
+
+		}
+
+
+
+		glUseProgram(m_program);
+
+
+		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_terrain<Type>), points.data(), GL_STATIC_DRAW);
+
+	}
+
 	void load()
 	{
 		glGenVertexArrays(1, &m_vao);
@@ -111,9 +191,6 @@ public:
 
 		Tools::Color<Type> vg = { 0, 1, 0, 1 };
 		Tools::Point3d<Type> nyp = { 0, +1, 0 };
-
-		using vt = vertex_struct_terrain<Type>;
-		std::vector<vertex_struct_terrain<Type>> points;
 
 		generateTerrainVerticesIndices(TERRAIN_SIZE, 1);
 		Tools::Point2d<Type> test{ 0, 0 };
@@ -267,6 +344,7 @@ private:
 
 	GLuint m_elementbuffer;
 	std::vector<Tools::Point3d<Type>> m_vertexVect;
+	std::vector<vertex_struct_terrain<Type>> points;
 	std::vector<unsigned int> m_indices;
 
 	ProceduralGeneration::PerlinNoise<Type> m_perlinNoise;

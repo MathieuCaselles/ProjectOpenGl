@@ -64,7 +64,11 @@ void MainScene::processInput(sf::Event& inputEvent)
     {
         m_cameraPos.y -= m_cameraSpeed;
     }
-    
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::T))
+    {
+        terrain->reloadHeight();
+    }    
 
 	IScene::processInput(inputEvent);
 }
