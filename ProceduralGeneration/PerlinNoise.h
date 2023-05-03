@@ -13,26 +13,30 @@ namespace ProceduralGeneration {
 
     public:
         //  Definition of the gradient grid
-        explicit PerlinNoise(int seed = 666) : m_grid(seed), m_frequency(1), m_amplitude(1), m_octaves(1), m_exponent(1)
+        explicit PerlinNoise(int seed = 666) : m_grid(seed), m_frequency(1), m_scale(1), m_amplitude(1), m_octaves(1), m_exponent(1), m_flatFloorLevel(0)
         {
         }
 
         inline const Type& compute(Type x, Type y) 
         {
+            int seed = 666;
                 Type noiseValue = 0.0;
                 Type amplitude = 1;
                 Type frequency = m_frequency;
 
                 for (int i = 0; i < m_octaves; ++i)
                 {
-                    x = x * m_frequency;
-                    y = y * m_frequency;
+                    x = x / m_scale * frequency;
+                    y = y / m_scale * frequency;
                     noiseValue = noiseValue + getPerlinNoise2d(x, y) * amplitude;
                     amplitude = amplitude / static_cast<Type>(2.f);
                     frequency = frequency * static_cast<Type>(2.f);
                 }
 
-            return redistribution(noiseValue) * m_amplitude;
+                noiseValue = redistribution(noiseValue);
+                noiseValue = applyFlatFloorLevel(noiseValue);
+
+            return noiseValue * m_amplitude;
         }
 
 
@@ -45,6 +49,11 @@ namespace ProceduralGeneration {
         inline void setFrequency(const Type frequency) 
         {
 			m_frequency = frequency;
+		}
+
+        inline void setScale(const Type scale)
+        {
+			m_scale = scale;
 		}
 
         inline void setOctaves(const int octaves)
@@ -60,6 +69,16 @@ namespace ProceduralGeneration {
         inline void setSeed(const int seed)
         {
             m_grid.setSeed(seed);
+        }
+
+        inline const int& getSeed() const
+        {
+			return m_grid.getSeed();
+		}
+
+        inline void setFlatFloorLevel(const Type waterLevel)
+        {
+            m_flatFloorLevel = waterLevel;
         }
 
     private:
@@ -106,6 +125,11 @@ namespace ProceduralGeneration {
             return std::pow(noiseValue, m_exponent);
         }
 
+        inline const Type& applyFlatFloorLevel(const Type& noiseValue) const
+        {
+
+            return std::max(noiseValue, m_flatFloorLevel);
+        }
 
 
         //attributes
@@ -113,10 +137,13 @@ namespace ProceduralGeneration {
 
         Type m_amplitude;
         Type m_frequency;
+        Type m_scale;
 
         int m_octaves;
 
         Type m_exponent;
+
+        Type m_flatFloorLevel;
     };
 
 }
