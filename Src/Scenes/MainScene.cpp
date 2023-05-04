@@ -163,12 +163,12 @@ void MainScene::createUI() {
     ImGui::PopStyleVar();
 
     ImGui::SeparatorText("Terrain");
-    ImGui::SliderInt("Terrain size", &m_terrainSize, 1, 10000);
+    ImGui::SliderInt("Terrain size", &m_terrainSize, 1, 5000);
     ImGui::Checkbox("Custom water size", &m_customWaterSize);
     if (!m_customWaterSize) {
         ImGui::BeginDisabled();
     }
-    ImGui::SliderInt("Water size", &m_waterSize, 1, 10000);
+    ImGui::SliderInt("Water size", &m_waterSize, 1, 5000);
     if (!m_customWaterSize) {
         ImGui::EndDisabled();
     }

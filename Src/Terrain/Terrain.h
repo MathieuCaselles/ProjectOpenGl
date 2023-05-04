@@ -253,9 +253,11 @@ public:
         m_shouldReload = false;
         m_elapsedTimeSinceShouldReload = 0.f;
 
+        glDeleteVertexArrays(1, &m_vao);
 		glGenVertexArrays(1, &m_vao);
 		glBindVertexArray(m_vao);
 
+        glDeleteBuffers(1, &m_vbo);
 		glGenBuffers(1, &m_vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
@@ -347,11 +349,10 @@ public:
 		glEnableVertexAttribArray(3);
 
 
+        glDeleteBuffers(1, &m_elementbuffer);
 		glGenBuffers(1, &m_elementbuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), &m_indices[0], GL_STATIC_DRAW);
-
-
 	}
 
 	void render(const Tools::Mat4<Type>& View, const Tools::Mat4<Type>& Projection)
