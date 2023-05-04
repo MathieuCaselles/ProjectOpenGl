@@ -55,17 +55,19 @@ public:
 		const int numVertices = static_cast<int>(size / step) + 1;
 
 		m_perlinNoise.setFrequency(5);
+		m_perlinNoise.setScale(1);
 		m_perlinNoise.setAmplitude(18);
 		m_perlinNoise.setOctaves(4);
 		m_perlinNoise.setExponent(3.5);
+		m_perlinNoise.setFlatFloorLevel(0.2);
 
 		const Type width = numVertices;
 		const Type height = numVertices;
 
 		std::vector<std::vector<Type>> heightmap(width, std::vector<Type>(height));
 
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
 				const Type nx = static_cast<Type>(x) / static_cast<Type>(width) - static_cast<Type>(0.5f);
 				const Type ny = static_cast<Type>(y) / static_cast<Type>(height) - static_cast<Type>(0.5f);
 				heightmap[y][x] = m_perlinNoise.compute(nx, ny); // todo: no hardcord magic value to increase height of noise
