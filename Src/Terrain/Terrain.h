@@ -39,6 +39,14 @@ public:
 
 	Terrain()
 	{
+		m_perlinNoise.setAmplitude(20);
+		m_perlinNoise.setPersistance(0.5f);
+		m_perlinNoise.setFrequency(6);
+		m_perlinNoise.setLacunarity(0.8);
+		m_perlinNoise.setOctaves(4);
+		m_perlinNoise.setExponent(3);
+		m_perlinNoise.setFlatFloorLevel(0.1);
+
 		load();
 	}
 
@@ -49,31 +57,18 @@ public:
 		glDeleteBuffers(1, &m_elementbuffer);
 	}
 
+
+
 	void generateTerrainVerticesIndices(int size, float step)
 	{
+
 		const int numVertices = static_cast<int>(size / step) + 1;
 
-		m_perlinNoise.setAmplitude(20);
-		m_perlinNoise.setPersistance(0.5f);
-		m_perlinNoise.setFrequency(6);
-		m_perlinNoise.setLacunarity(0.8);
-		m_perlinNoise.setScale(1);
-		m_perlinNoise.setOctaves(4);
-		m_perlinNoise.setExponent(3);
-		m_perlinNoise.setFlatFloorLevel(0.2);
 
-		const Type width = numVertices;
-		const Type height = numVertices;
+		const int width = numVertices;
+		const int height = numVertices;
 
-		std::vector<std::vector<Type>> heightmap(width, std::vector<Type>(height));
-
-		for (int y = 0; y < height; ++y) {
-			for (int x = 0; x < width; ++x) {
-				const Type nx = static_cast<Type>(x) / static_cast<Type>(width) - static_cast<Type>(0.5f);
-				const Type ny = static_cast<Type>(y) / static_cast<Type>(height) - static_cast<Type>(0.5f);
-				heightmap[y][x] = m_perlinNoise.compute(nx, ny); // todo: no hardcord magic value to increase height of noise
-			}
-		}
+		auto heightmap = m_perlinNoise.computeHeightmap(width, height);
 
 		// Vertices
         m_vertexVect.clear();
@@ -195,19 +190,11 @@ public:
 		const Type width = numVertices;
 		const Type height = numVertices;
 
-		std::vector<std::vector<Type>> heightmap(width, std::vector<Type>(height));
-
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				const Type nx = static_cast<Type>(x) / static_cast<Type>(width) - static_cast<Type>(0.5f);
-				const Type ny = static_cast<Type>(y) / static_cast<Type>(height) - static_cast<Type>(0.5f);
-				heightmap[y][x] = m_perlinNoise.compute(nx, ny); // todo: no hardcord magic value to increase height of noise
-			}
-		}
+		auto heightmap = m_perlinNoise.computeHeightmap(width, height);
 
 		for (vertex_struct_terrain<Type>& p : m_points) {
 
-			p.p.y = heightmap[p.p.z][p.p.x] - 15;
+			p.p.y = heightmap[p.p.z][p.p.x];
 		}
 
 		for (int i = 2; i < m_indices.size(); i += 3) {

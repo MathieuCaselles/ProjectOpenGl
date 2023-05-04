@@ -59,7 +59,7 @@ private:
 
     float m_snowHeight = 30.f;
     float m_stoneAngle = 60.f;
-    float m_waterHeight = 8.f;
+    float m_waterHeight = 3.5f;
     float m_sandHeight = 9.f;
     bool m_customSandHeight = false;
 

@@ -10,10 +10,10 @@ namespace ImGui::SFML::OpenGL3 {
 
     void Render(sf::RenderTarget& target) {
         //target.resetGLStates();
-        target.pushGLStates();
+        //target.pushGLStates();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        target.popGLStates();
+       // target.popGLStates();
     }
 
     void Render(sf::RenderWindow& window) {
