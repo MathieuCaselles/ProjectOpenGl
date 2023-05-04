@@ -109,6 +109,40 @@ public:
 		}
 	}
 
+	void setSeed(int newSeed) {
+		
+		m_perlinNoise.setSeed(newSeed);
+		reloadHeight();
+
+	};
+
+	void setFrequency(Type newFrequency) {
+
+		m_perlinNoise.setFrequency(newFrequency);
+		reloadHeight();
+
+	};
+
+	void setAmplitude(Type newAmplitude) {
+
+		m_perlinNoise.setAmplitude(newAmplitude);
+		reloadHeight();
+
+	};
+
+	void setOctave(int newOctave) {
+
+		m_perlinNoise.setOctaves(newOctave);
+		reloadHeight();
+
+	};
+
+	void setExponent(Type newExponent) {
+		
+		m_perlinNoise.setExponent(newExponent);
+		reloadHeight();
+	};
+
 	void reloadHeight() {
 
 
@@ -116,13 +150,6 @@ public:
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
 		const int numVertices = static_cast<int>(TERRAIN_SIZE / TERRAIN_STEP) + 1;
-
-		m_perlinNoise.setSeed(251); // Changer la seed dans les Ui en passant en parametre de cette méthode
-
-		m_perlinNoise.setFrequency(5);
-		m_perlinNoise.setAmplitude(18);
-		m_perlinNoise.setOctaves(4);
-		m_perlinNoise.setExponent(3.5);
 
 		const Type width = numVertices;
 		const Type height = numVertices;
