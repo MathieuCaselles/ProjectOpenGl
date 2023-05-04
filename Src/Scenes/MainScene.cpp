@@ -91,6 +91,13 @@ void MainScene::update(const float& deltaTime)
     IScene::update(deltaTime);
 	V = Mat4f::rotationX(-m_cameraBeta) * Mat4f::rotationY(-m_cameraAlpha) * Mat4f::translation(-m_cameraPos.x, -m_cameraPos.y, -m_cameraPos.z);
 
+    if (!m_customSandHeight) {
+        m_sandHeight = m_waterHeight + 1.5f;
+    }
+    if (!m_customWaterSize) {
+        m_waterSize = m_terrainSize;
+    }
+
     p_terrain->setSeed(m_seed);
     p_terrain->setFrequency(m_frequency);
     p_terrain->setAmplitude(m_amplitude);
@@ -111,7 +118,7 @@ void MainScene::update(const float& deltaTime)
 
     p_terrain->setSnowHeight(m_snowHeight);
     p_terrain->setStoneAngle(m_stoneAngle);
-    p_terrain->setWaterHeight(m_waterHeight);
+    p_terrain->setSandHeight(m_sandHeight);
 
     p_water->setWaterHeight(m_waterHeight);
     p_water->setWaterClearness(m_waterClearness);
@@ -144,6 +151,7 @@ void MainScene::createUI() {
     ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor(m_themeColor[0], m_themeColor[1], m_themeColor[2]));
     ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, (ImVec4)ImColor(getTintFromColor(m_themeColor[0], 1.2f), getTintFromColor(m_themeColor[1], 1.2f), getTintFromColor(m_themeColor[2], 1.2f)));
     ImGui::PushStyleColor(ImGuiCol_FrameBgActive, (ImVec4)ImColor(getTintFromColor(m_themeColor[0], 1.2f), getTintFromColor(m_themeColor[1], 1.2f), getTintFromColor(m_themeColor[2], 1.2f)));
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, (ImVec4)ImColor(getTintFromColor(m_themeColor[0], 1.8f), getTintFromColor(m_themeColor[1], 1.8f), getTintFromColor(m_themeColor[2], 1.8f)));
     ImGui::PushStyleColor(ImGuiCol_SliderGrab, (ImVec4)ImColor(getTintFromColor(m_themeColor[0], 1.5f), getTintFromColor(m_themeColor[1], 1.5f), getTintFromColor(m_themeColor[2], 1.5f)));
     ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, (ImVec4)ImColor(getTintFromColor(m_themeColor[0], 1.6f), getTintFromColor(m_themeColor[1], 1.6f), getTintFromColor(m_themeColor[2], 1.6f)));
     ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor(m_themeColor[0], m_themeColor[1], m_themeColor[2]));
@@ -156,7 +164,14 @@ void MainScene::createUI() {
 
     ImGui::SeparatorText("Terrain");
     ImGui::SliderInt("Terrain size", &m_terrainSize, 1, 10000);
+    ImGui::Checkbox("Custom water size", &m_customWaterSize);
+    if (!m_customWaterSize) {
+        ImGui::BeginDisabled();
+    }
     ImGui::SliderInt("Water size", &m_waterSize, 1, 10000);
+    if (!m_customWaterSize) {
+        ImGui::EndDisabled();
+    }
     ImGui::SameLine(); ImGui::Helpers::HelpMarker("Should be the same as terrain size, but you can try to play with it.");
     ImGui::SliderFloat("Water clearness", &m_waterClearness, 0.f, 1.f);
     ImGui::RadioButton("Draw points", &m_drawMode, 0);
@@ -174,6 +189,7 @@ void MainScene::createUI() {
     ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes the number of octaves used to generate the final perlin noise.");
     ImGui::SliderFloat("Exponent", &m_exponent, 0.f, 100.f);
     ImGui::SameLine(); ImGui::Helpers::HelpMarker("Applies the exponent on redistribution.");
+
     ImGui::SeparatorText("Additional configuration");
     ImGui::SliderFloat("Snow height", &m_snowHeight, 0.f, 100.f);
     ImGui::SameLine(); ImGui::Helpers::HelpMarker("Defines when to start rendering snow.");
@@ -181,6 +197,15 @@ void MainScene::createUI() {
     ImGui::SameLine(); ImGui::Helpers::HelpMarker("Defines when to start rendering stone instead of grass based on angle of vertex.");
     ImGui::SliderFloat("Water height", &m_waterHeight, 0.f, 100.f);
     ImGui::SameLine(); ImGui::Helpers::HelpMarker("Defines when to start rendering water.");
+    ImGui::Checkbox("Custom sand height", &m_customSandHeight);
+    if (!m_customSandHeight) {
+        ImGui::BeginDisabled();
+    }
+    ImGui::SliderFloat("Sand height", &m_sandHeight, 0.f, 100.f);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Defines when to start rendering sand. Based on water if not custom.");
+    if (!m_customSandHeight) {
+        ImGui::EndDisabled();
+    }
     ImGui::End();
 
     ImGui::Begin("Theme");
@@ -193,5 +218,5 @@ void MainScene::createUI() {
     ImGui::Text("%i Water Primitives", (unsigned int) p_water->getPrimitivesCount());
     ImGui::End();
 
-    ImGui::PopStyleColor(9);
+    ImGui::PopStyleColor(10);
 }
