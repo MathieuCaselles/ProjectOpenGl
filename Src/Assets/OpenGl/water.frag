@@ -34,6 +34,8 @@ uniform DirectionalLight light;
 uniform Camera camera;
 uniform sampler2D textureWater;
 
+uniform float waterClearness;
+
 void main()
 {	
 	vec3 worldEye = normalize(iWorldPosition - camera.worldPosition);
@@ -42,7 +44,7 @@ void main()
 	vec3 specular = light.color * pow(max(0, dot(worldEye, pprime)), material.specularSmoothness) * material.specular;
 
 	vec4 texColor1 = texture(textureWater, iTexCoord);
-	texColor1.a = 0.5;
+	texColor1.a = waterClearness;
 
 	vec4 color = vec4(0.0);
 	float angle = degrees(acos(dot(iWorldNormal, vec3(0, -1, 0))));
@@ -52,6 +54,6 @@ void main()
 	vec3 ambient = material.ambient * color.rgb;
 	vec3 diffuse = max(0, -dot(iWorldNormal, light.direction)) * light.color * color.rgb;
 
-	fragColor = vec4(ambient + diffuse + specular, 1.f) + color;
-	fragColor.a = 0.5;
+	fragColor = vec4(ambient + diffuse + specular / 2, 1.f) + color;
+	fragColor.a = waterClearness;
 }

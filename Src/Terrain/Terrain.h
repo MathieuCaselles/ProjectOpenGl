@@ -178,6 +178,10 @@ public:
 		load();
 	};
 
+	void setWaterHeight(float waterHeight) {
+		m_waterHeight = waterHeight;
+	}
+
 	void reloadHeight() {
 		glBindVertexArray(m_vao);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -368,6 +372,7 @@ public:
 
 		glUniform1f(glGetUniformLocation(m_program, "snowHeight"), m_snowHeight);
 		glUniform1f(glGetUniformLocation(m_program, "stoneAngle"), m_stoneAngle);
+		glUniform1f(glGetUniformLocation(m_program, "waterHeight"), m_waterHeight);
 
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
@@ -381,12 +386,17 @@ public:
 		glActiveTexture(GL_TEXTURE2);
 		m_textureStone.bind();
 
-		GLint texture1Loc = glGetUniformLocation(m_program, "texture1");
-		GLint texture2Loc = glGetUniformLocation(m_program, "texture2");
-		GLint texture3Loc = glGetUniformLocation(m_program, "texture3"); // Revoir le nomage
+		glActiveTexture(GL_TEXTURE3);
+		m_textureSand.bind();
+
+		GLint texture1Loc = glGetUniformLocation(m_program, "textureGrass");
+		GLint texture2Loc = glGetUniformLocation(m_program, "textureSnow");
+		GLint texture3Loc = glGetUniformLocation(m_program, "textureStone");
+		GLint texture4Loc = glGetUniformLocation(m_program, "textureSand");
 		glUniform1i(texture1Loc, 0);
 		glUniform1i(texture2Loc, 1);
 		glUniform1i(texture3Loc, 2);
+		glUniform1i(texture4Loc, 3);
 
 		glDrawElements(
 			GL_TRIANGLES,      // mode
@@ -416,6 +426,7 @@ private:
 
 	float m_snowHeight = 30;
 	float m_stoneAngle = 60;
+	float m_waterHeight = 8;
 
 	GLuint m_elementbuffer;
 	std::vector<Tools::Point3d<Type>> m_vertexVect;
@@ -427,6 +438,8 @@ private:
 	Texture m_textureGrass = Texture("Assets/Textures/grass.png");
 	Texture m_textureSnow = Texture("Assets/Textures/snow.png");
 	Texture m_textureStone = Texture("Assets/Textures/stone.png");
+	Texture m_textureSand = Texture("Assets/Textures/sand.png");
+
 	//Texture m_textureStone = Texture("C:/Users/Thomas/Desktop/testTexture.png");
 
 

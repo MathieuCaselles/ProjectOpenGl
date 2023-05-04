@@ -53,7 +53,7 @@ public:
 			for (int j = 0; j < numVertices; ++j) {
 				const Type x = i * step;
 				const Type z = j * step;
-				const Type y = 2;
+				const Type y = m_waterHeight;
 				m_vertexVect.push_back(Tools::Point3d<Type>{x, y, z});
 			}
 		}
@@ -94,6 +94,28 @@ public:
 		load();
 	};
 
+	void setWaterHeight(float waterHeight) {
+		m_waterHeight = waterHeight;
+		m_shouldReload = true;
+	}
+
+	void reloadHeight() {
+		glBindVertexArray(m_vao);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+
+		for (vertex_struct_water<Type>& p : points) {
+
+			p.p.y = m_waterHeight;
+		}
+
+		glUseProgram(m_program);
+		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_terrain<Type>), points.data(), GL_STATIC_DRAW);
+	}
+
+	void setWaterClearness(float clearness) {
+		m_waterClearness = clearness;
+	}
+
 	void load()
 	{
 		glGenVertexArrays(1, &m_vao);
@@ -107,7 +129,6 @@ public:
 		Tools::Point3d<Type> nyn = { 0, -1, 0 };
 		
 		using vt = vertex_struct_water<Type>;
-		std::vector<vertex_struct_water<Type>> points;
 
 		generateWaterVerticesIndices(m_waterSize, m_waterSize);
 
@@ -187,6 +208,7 @@ public:
 
 		glUniform3f(glGetUniformLocation(m_program, "camera.worldPosition"), 0.f, 0.f, 0.f);
 
+		glUniform1f(glGetUniformLocation(m_program, "waterClearness"), m_waterClearness);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
 
@@ -207,6 +229,10 @@ public:
 
 	void update()
 	{
+		if (m_shouldReload) {
+			reloadHeight();
+			m_shouldReload = false;
+		}
 	}
 
 private:
@@ -218,10 +244,16 @@ private:
 	GLsizei m_nbVertices;
 
 	float m_waterSize = 1000;
+	float m_waterHeight = 8;
+	float m_waterClearness = 0.5;
+
+	bool m_shouldReload = false;
 
 	GLuint m_elementbuffer;
 	std::vector<Tools::Point3d<Type>> m_vertexVect;
 	std::vector<unsigned int> m_indices;
+	std::vector<vertex_struct_water<Type>> points;
+
 
 
 	Texture m_textureWater = Texture("Assets/Textures/water.png");
