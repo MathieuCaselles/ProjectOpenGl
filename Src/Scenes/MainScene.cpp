@@ -1,6 +1,6 @@
 #include "MainScene.h"
-//#include "GL/glew.h"
-//#include "SFML/OpenGL.hpp"
+#include "GL/glew.h"
+#include "SFML/OpenGL.hpp"
 #include "imgui.h"
 #include "imgui-SFML.h"
 
@@ -20,7 +20,7 @@ MainScene::~MainScene()
 void MainScene::onBeginPlay() {
 	sf::Mouse::setPosition(sf::Vector2i(400, 300), m_window);
 
-    //terrain = std::make_unique<Terrainf>();
+    terrain = std::make_unique<Terrainf>();
     //water = std::make_unique<Waterf>();
 }
 
@@ -31,13 +31,13 @@ void MainScene::processInput(sf::Event& inputEvent)
     if (inputEvent.key.code == sf::Keyboard::Escape) {
         m_window.close();
     }
-   /* else if (inputEvent.type == sf::Event::MouseMoved) {
+    else if (inputEvent.type == sf::Event::MouseMoved) {
         float dx = 400.f - float(inputEvent.mouseMove.x);
         float dy = 300.f - float(inputEvent.mouseMove.y);
         sf::Mouse::setPosition(sf::Vector2i(400, 300), m_window);
         m_cameraAlpha += 0.001f * dx;
         m_cameraBeta -= 0.001f * dy;
-    }*/
+    }
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
     {
@@ -81,8 +81,8 @@ void MainScene::update(const float& deltaTime, sf::Time clockRestart)
 {
     V = Mat4f::rotationX(-m_cameraBeta) * Mat4f::rotationY(-m_cameraAlpha) * Mat4f::translation(-m_cameraPos.x, -m_cameraPos.y, -m_cameraPos.z);
 
-    //terrain->update();
-    //water->update();
+    /*terrain->update();
+    water->update();*/
     sf::Clock deltaClock;
     ImGui::SFML::Update(m_window, clockRestart);
 
@@ -95,8 +95,8 @@ void MainScene::update(const float& deltaTime, sf::Time clockRestart)
 
 void MainScene::render()
 {
-   // terrain->render(V, P);
-   // water->render(V, P);
+    //terrain->render(V, P);
+    //water->render(V, P);
 
 
     ImGui::SFML::Render(m_window);
