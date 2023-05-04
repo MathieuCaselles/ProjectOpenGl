@@ -50,9 +50,35 @@ private:
     std::unique_ptr<Terrainf> p_terrain;
     std::unique_ptr<Waterf> p_water;
 
+    int m_terrainSize = 1000;
+    int m_waterSize = 1000;
+    float m_waterClearness = 0.5f;
+    // 0 points, 1 polygons, 2 fill
+    int m_drawMode = 2;
+
+    float m_snowHeight = 30;
+    float m_stoneAngle = 60;
+    float m_waterHeight = 8;
+
     int m_seed = 666;
     float m_frequency = 6.f;
     float m_amplitude = 20.f;
     int m_octave = 4;
     float m_exponent = 3.f;
+
+    float m_elapsedTimeSinceLastSecond = 0.f;
+    int m_numberOfFramesSinceLastSecond = 0;
+    int m_framesPerSeconds = 0;
+
+    float m_themeColor[3] = {0.2f, 0.2f, 0.2f};
+
+    // color between 0 and 1
+    static float getTintFromColor(const float& color, const float& tint)
+    {
+        if (color * tint > 1.f) {
+            return color * (1 - (tint - 1));
+        }
+
+        return color * tint;
+    }
 };

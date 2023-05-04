@@ -84,7 +84,6 @@ public:
 	}
 
 	void setWaterSize(int waterSize) {
-
 		m_waterSize = waterSize;
 		m_vertexVect.clear();
 
@@ -95,8 +94,10 @@ public:
 	};
 
 	void setWaterHeight(float waterHeight) {
-		m_waterHeight = waterHeight;
-		m_shouldReload = true;
+        if (m_waterHeight != waterHeight) {
+            m_waterHeight = waterHeight;
+            m_shouldReload = true;
+        }
 	}
 
 	void reloadHeight() {
@@ -234,6 +235,12 @@ public:
 			m_shouldReload = false;
 		}
 	}
+
+    inline size_t getPrimitivesCount() const
+    {
+        // we have triangles
+        return m_indices.size() / 3;
+    }
 
 private:
 	Type m_angleX = 0;
