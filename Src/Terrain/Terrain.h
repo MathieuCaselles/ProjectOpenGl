@@ -49,8 +49,11 @@ public:
 		glDeleteBuffers(1, &m_elementbuffer);
 	}
 
+
+
 	void generateTerrainVerticesIndices(int size, float step)
 	{
+
 		const int numVertices = static_cast<int>(size / step) + 1;
 
 		m_perlinNoise.setAmplitude(20);
@@ -60,70 +63,12 @@ public:
 		m_perlinNoise.setScale(1);
 		m_perlinNoise.setOctaves(4);
 		m_perlinNoise.setExponent(3);
-		m_perlinNoise.setFlatFloorLevel(0.2);
+		m_perlinNoise.setFlatFloorLevel(0.1);
 
-		const Type width = numVertices;
-		const Type height = numVertices;
+		const int width = numVertices;
+		const int height = numVertices;
 
-		std::vector<std::vector<Type>> heightmap(width, std::vector<Type>(height));
-
-		for (int y = 0; y < height; ++y) {
-			for (int x = 0; x < width; ++x) {
-				const Type nx = static_cast<Type>(x) / static_cast<Type>(width) - static_cast<Type>(0.5f);
-				const Type ny = static_cast<Type>(y) / static_cast<Type>(height) - static_cast<Type>(0.5f);
-				heightmap[y][x] = m_perlinNoise.compute(nx, ny); // todo: no hardcord magic value to increase height of noise
-			}
-		}
-
-		m_perlinNoiseWater.setAmplitude(1);
-		m_perlinNoiseWater.setPersistance(0.5f);
-		m_perlinNoiseWater.setFrequency(1);
-		m_perlinNoiseWater.setLacunarity(1.5);
-		m_perlinNoiseWater.setScale(1);
-		m_perlinNoiseWater.setOctaves(1);
-		m_perlinNoiseWater.setExponent(1);
-
-		// Créer des lacs aléatoirement sur les zones plates
-
-
-		const Type flatFloorLevel = 0.5 * m_perlinNoise.getAmplitude();
-		const float lakeProbability = 0.0001f; // probabilité de créer un lac dans une zone plate donnée
-
-
-		for (int y = 0; y < height; ++y) {
-			for (int x = 0; x < width; ++x) {
-				const Type currentHeight = heightmap[y][x];
-				if (currentHeight <= flatFloorLevel) { // Vérifie si la hauteur est plate
-					if ((float)rand() / (float)RAND_MAX < lakeProbability) { // Détermine aléatoirement si un lac doit être créé
-
-						std::random_device rd;
-						std::mt19937 gen(rd());
-						std::uniform_int_distribution<int> dis(5, 60);
-						const Type lakeRadius= dis(gen);
-
-						std::random_device rd2;
-						std::mt19937 gen2(rd2());
-						std::uniform_int_distribution<int> dis2(5, 20);
-						const Type lakeDepth = dis2(gen);
-
-						const Type lakeCenterDepth = currentHeight + lakeDepth;
-
-						for (int dy = -lakeRadius; dy <= lakeRadius; ++dy) {
-							for (int dx = -lakeRadius; dx <= lakeRadius; ++dx) {
-								const int nx = x + dx;
-								const int ny = y + dy;
-								const Type noiseWater = m_perlinNoiseWater.compute(nx, ny);
-								if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
-								const Type distance = sqrt(dx * dx + dy * dy);
-								if (distance <= lakeRadius) {
-									heightmap[ny][nx] -= lakeCenterDepth * (1 - distance / lakeRadius);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+		auto heightmap = m_perlinNoise.computeHeightmap(width, height);
 
 		// Vertices
         m_vertexVect.clear();
@@ -243,15 +188,7 @@ public:
 		const Type width = numVertices;
 		const Type height = numVertices;
 
-		std::vector<std::vector<Type>> heightmap(width, std::vector<Type>(height));
-
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				const Type nx = static_cast<Type>(x) / static_cast<Type>(width) - static_cast<Type>(0.5f);
-				const Type ny = static_cast<Type>(y) / static_cast<Type>(height) - static_cast<Type>(0.5f);
-				heightmap[y][x] = m_perlinNoise.compute(nx, ny); // todo: no hardcord magic value to increase height of noise
-			}
-		}
+		auto heightmap = m_perlinNoise.computeHeightmap(width, height);
 
 		for (vertex_struct_terrain<Type>& p : m_points) {
 

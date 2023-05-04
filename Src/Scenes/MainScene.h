@@ -58,7 +58,7 @@ private:
 
     float m_snowHeight = 30;
     float m_stoneAngle = 60;
-    float m_waterHeight = 8;
+    float m_waterHeight = 3.5f;
 
     int m_seed = 666;
     float m_frequency = 6.f;
