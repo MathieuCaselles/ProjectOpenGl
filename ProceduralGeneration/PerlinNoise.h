@@ -177,7 +177,6 @@ namespace ProceduralGeneration {
 
         inline const Type& applyFlatFloorLevel(const Type& noiseValue) const
         {
-
             return std::max(noiseValue, m_flatFloorLevel);
         }
 

@@ -84,7 +84,6 @@ public:
 	}
 
 	void setWaterSize(int waterSize) {
-
 		m_waterSize = waterSize;
 		m_vertexVect.clear();
 
@@ -95,8 +94,10 @@ public:
 	};
 
 	void setWaterHeight(float waterHeight) {
-		m_waterHeight = waterHeight;
-		m_shouldReload = true;
+		if (m_waterHeight != waterHeight) {
+			m_waterHeight = waterHeight;
+			m_shouldReload = true;
+		}
 	}
 
 	void reloadHeight() {
@@ -235,6 +236,12 @@ public:
 		}
 	}
 
+    inline size_t getPrimitivesCount() const
+    {
+        // we have triangles
+        return m_indices.size() / 3;
+    }
+
 private:
 	Type m_angleX = 0;
 	Type m_angleY = 0;
@@ -254,10 +261,5 @@ private:
 	std::vector<unsigned int> m_indices;
 	std::vector<vertex_struct_water<Type>> m_points;
 
-
-
 	Texture m_textureWater = Texture("Assets/Textures/water.png");
-
-
-
 };
