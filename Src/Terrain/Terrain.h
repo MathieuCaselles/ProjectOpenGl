@@ -77,6 +77,7 @@ public:
 
 		// Vertices
         m_vertexVect.clear();
+        m_vertexVect.reserve(numVertices * numVertices);
 		for (int i = 0; i < numVertices; ++i) {
 			for (int j = 0; j < numVertices; ++j) {
 				const Type x = i * step;
@@ -86,9 +87,11 @@ public:
 
 			}
 		}
+        m_vertexVect.shrink_to_fit();
 
 		// Indices
         m_indices.clear();
+        m_indices.reserve(numVertices * numVertices);
 		for (int i = 0; i < numVertices - 1; ++i) {
 			for (int j = 0; j < numVertices - 1; ++j) {
 
@@ -108,7 +111,6 @@ public:
 				m_indices.push_back(index3);
 			}
 		}
-		m_vertexVect.shrink_to_fit();
 		m_indices.shrink_to_fit();
 	}
 
@@ -180,8 +182,8 @@ public:
         }
 	};
 
-	void setWaterHeight(float waterHeight) {
-		m_waterHeight = waterHeight;
+	void setSandHeight(float sandHeight) {
+        m_sandHeight = sandHeight;
 	}
 
 	void reloadHeight() {
@@ -251,9 +253,11 @@ public:
         m_shouldReload = false;
         m_elapsedTimeSinceShouldReload = 0.f;
 
+        glDeleteVertexArrays(1, &m_vao);
 		glGenVertexArrays(1, &m_vao);
 		glBindVertexArray(m_vao);
 
+        glDeleteBuffers(1, &m_vbo);
 		glGenBuffers(1, &m_vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
@@ -262,9 +266,9 @@ public:
 		Tools::Point2d<Type> texCoord;
 
 		generateTerrainVerticesIndices(m_terrainSize, 1);
-		
 
         m_points.clear();
+        m_points.reserve(m_vertexVect.size());
 		for (Tools::Point3d<float>& p : m_vertexVect)
 		{
 			m_points.push_back(vt{ p, nyp, vg , texCoord });
@@ -282,7 +286,6 @@ public:
 			float zSquare = (p.p.z + 0.5f) / squareSize;
 			p.t = Tools::Point2d<Type>{ Type(xSquare * squareSize), Type(zSquare * squareSize) };
 		}
-
 
 		for (int i = 2; i < m_indices.size(); i += 3) {
 
@@ -346,11 +349,10 @@ public:
 		glEnableVertexAttribArray(3);
 
 
+        glDeleteBuffers(1, &m_elementbuffer);
 		glGenBuffers(1, &m_elementbuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), &m_indices[0], GL_STATIC_DRAW);
-
-
 	}
 
 	void render(const Tools::Mat4<Type>& View, const Tools::Mat4<Type>& Projection)
@@ -377,7 +379,7 @@ public:
 
 		glUniform1f(glGetUniformLocation(m_program, "snowHeight"), m_snowHeight);
 		glUniform1f(glGetUniformLocation(m_program, "stoneAngle"), m_stoneAngle);
-		glUniform1f(glGetUniformLocation(m_program, "waterHeight"), m_waterHeight);
+		glUniform1f(glGetUniformLocation(m_program, "waterHeight"), m_sandHeight);
 
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
@@ -442,7 +444,7 @@ private:
 
 	float m_snowHeight = 30;
 	float m_stoneAngle = 60;
-	float m_waterHeight = 8;
+	float m_sandHeight = 8;
 
 	GLuint m_elementbuffer;
 	std::vector<Tools::Point3d<Type>> m_vertexVect;

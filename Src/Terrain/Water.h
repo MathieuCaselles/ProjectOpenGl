@@ -48,6 +48,8 @@ public:
 	{
 		const int numVertices = static_cast<int>(size / step) + 1;
 
+        m_vertexVect.clear();
+        m_vertexVect.reserve(numVertices * numVertices);
 		// Vertices
 		for (int i = 0; i < numVertices; ++i) {
 			for (int j = 0; j < numVertices; ++j) {
@@ -57,7 +59,10 @@ public:
 				m_vertexVect.push_back(Tools::Point3d<Type>{x, y, z});
 			}
 		}
+        m_vertexVect.shrink_to_fit();
 
+        m_indices.clear();
+        m_indices.reserve(numVertices * numVertices);
 		// Indices
 		for (int i = 0; i < numVertices - 1; ++i) {
 			for (int j = 0; j < numVertices - 1; ++j) {
@@ -78,17 +83,15 @@ public:
 				m_indices.push_back(index3);
 			}
 		}
-
-		m_vertexVect.shrink_to_fit();
-		m_indices.shrink_to_fit();
+        m_indices.shrink_to_fit();
 	}
 
 	void setWaterSize(int waterSize) {
-		m_waterSize = waterSize;
-		m_vertexVect.clear();
+        if (m_waterSize == waterSize) {
+            return;
+        }
 
-		m_indices.clear();
-		m_indices.reserve(1);
+		m_waterSize = waterSize;
 
 		load();
 	};
@@ -119,9 +122,11 @@ public:
 
 	void load()
 	{
+        glDeleteVertexArrays(1, &m_vao);
 		glGenVertexArrays(1, &m_vao);
 		glBindVertexArray(m_vao);
 
+        glDeleteBuffers(1, &m_vbo);
 		glGenBuffers(1, &m_vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
@@ -135,6 +140,8 @@ public:
 
 		Tools::Point2d<Type> test;
 
+        m_points.clear();
+        m_points.reserve(m_vertexVect.size());
 		for (Tools::Point3d<float>& p : m_vertexVect)
 		{
 			m_points.push_back(vt{ p, nyn, vb , test });
@@ -177,11 +184,10 @@ public:
 		glEnableVertexAttribArray(3);
 
 
+        glDeleteBuffers(1, &m_elementbuffer);
 		glGenBuffers(1, &m_elementbuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), &m_indices[0], GL_STATIC_DRAW);
-
-
 	}
 
 	void render(const Tools::Mat4<Type>& View, const Tools::Mat4<Type>& Projection)
@@ -250,7 +256,7 @@ private:
 	GLuint m_program = 0;
 	GLsizei m_nbVertices;
 
-	float m_waterSize = 1000;
+	int m_waterSize = 1000;
 	float m_waterHeight = 8;
 	float m_waterClearness = 0.5;
 
