@@ -28,8 +28,10 @@ void Game::run(sf::VideoMode videoMode, std::string windowTitle, sf::Uint32 styl
     // fucking lines of hell
     glewExperimental = GL_TRUE;
     if (glewInit())
-        throw std::runtime_error("Error");
-    ImGui::SFML::Init(m_window);
+        throw std::runtime_error("Error on glew init");
+    if (!ImGui::SFML::Init(m_window))
+        throw std::runtime_error("Error on imgui init");
+
     ImGui_ImplOpenGL3_Init();
 
     m_pCurrentScene->onBeginPlay();
