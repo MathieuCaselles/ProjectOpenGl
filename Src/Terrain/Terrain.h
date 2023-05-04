@@ -11,7 +11,6 @@
 #include "ProceduralGeneration/PerlinNoise.h"
 #include "Texture.h"
 
-constexpr float TERRAIN_SIZE = 1000;
 constexpr float TERRAIN_STEP = 1;
 
 
@@ -82,7 +81,7 @@ public:
 			for (int j = 0; j < numVertices; ++j) {
 				const Type x = i * step;
 				const Type z = j * step;
-				const Type y = heightmap[z][x] - 15;
+				const Type y = heightmap[z][x];
 				m_vertexVect.push_back(Tools::Point3d<Type>{x, y, z});
 
 			}
@@ -109,6 +108,8 @@ public:
 				m_indices.push_back(index3);
 			}
 		}
+		m_vertexVect.shrink_to_fit();
+		m_indices.shrink_to_fit();
 	}
 
 	void setSeed(int newSeed) {
@@ -146,11 +147,42 @@ public:
         }
 	};
 
+	void showPolygon() {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+
+	void showPoint() {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+	}
+
+	void showFill() {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+
+	void setSnowHeight(float snowHeight) {
+		m_snowHeight = snowHeight;
+	}
+
+	void setStoneAngle(float stoneAngle) {
+		m_stoneAngle = stoneAngle;
+	}
+
+	void setTerrainSize(int terrainSize) {
+
+		m_terrainSize = terrainSize;
+
+		m_vertexVect.clear();
+		points.clear();
+		m_indices.clear();
+
+		load();
+	};
+
 	void reloadHeight() {
 		glBindVertexArray(m_vao);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-		const int numVertices = static_cast<int>(TERRAIN_SIZE / TERRAIN_STEP) + 1;
+		const int numVertices = static_cast<int>(m_terrainSize / TERRAIN_STEP) + 1;
 
 		const Type width = numVertices;
 		const Type height = numVertices;
@@ -218,15 +250,18 @@ public:
 
 		Tools::Color<Type> vg = { 0, 1, 0, 1 };
 		Tools::Point3d<Type> nyp = { 0, +1, 0 };
+		Tools::Point2d<Type> texCoord;
 
-		generateTerrainVerticesIndices(TERRAIN_SIZE, 1);
-		Tools::Point2d<Type> test{ 0, 0 };
+		generateTerrainVerticesIndices(m_terrainSize, 1);
+		
 
         points.clear();
 		for (Tools::Point3d<float>& p : m_vertexVect)
 		{
-			points.push_back(vt{ p, nyp, vg , test });
+			points.push_back(vt{ p, nyp, vg , texCoord });
 		}
+
+		points.shrink_to_fit();
 
 		m_nbVertices = static_cast<GLsizei>(points.size());
 
@@ -331,6 +366,9 @@ public:
 
 		glUniform3f(glGetUniformLocation(m_program, "camera.worldPosition"), 0.f, 0.f, 0.f);
 
+		glUniform1f(glGetUniformLocation(m_program, "snowHeight"), m_snowHeight);
+		glUniform1f(glGetUniformLocation(m_program, "stoneAngle"), m_stoneAngle);
+
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
 
@@ -373,6 +411,11 @@ private:
 	GLuint m_vbo = 0;
 	GLuint m_program;
 	GLsizei m_nbVertices;
+
+	int m_terrainSize = 1000;
+
+	float m_snowHeight = 30;
+	float m_stoneAngle = 60;
 
 	GLuint m_elementbuffer;
 	std::vector<Tools::Point3d<Type>> m_vertexVect;

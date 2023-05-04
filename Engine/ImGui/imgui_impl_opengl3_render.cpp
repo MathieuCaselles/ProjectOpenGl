@@ -9,7 +9,7 @@ namespace ImGui::SFML::OpenGL3 {
     }
 
     void Render(sf::RenderTarget& target) {
-        target.resetGLStates();
+        //target.resetGLStates();
         target.pushGLStates();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

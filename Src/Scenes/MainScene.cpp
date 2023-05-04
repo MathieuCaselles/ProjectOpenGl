@@ -81,6 +81,30 @@ void MainScene::processInput(sf::Event& inputEvent)
 		}
 
 	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+	{
+		p_terrain->showPoint();
+	}if (sf::Keyboard::isKeyPressed(sf::Keyboard::O))
+	{
+		p_terrain->showPolygon();
+	}if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
+	{
+		p_terrain->showFill();
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::N))
+	{
+		p_terrain->setSnowHeight(8);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::B))
+	{
+		p_terrain->setStoneAngle(30);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::J))
+	{
+		p_terrain->setTerrainSize(100);
+		p_water->setWaterSize(100);
+	}
 
 	IScene::processInput(inputEvent);
 }

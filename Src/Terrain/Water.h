@@ -11,7 +11,6 @@
 #include "ProceduralGeneration/PerlinNoise.h"
 #include "Texture.h"
 
-constexpr float WATER_SIZE = 1000;
 
 
 template<typename Type>
@@ -49,16 +48,6 @@ public:
 	{
 		const int numVertices = static_cast<int>(size / step) + 1;
 
-		m_perlinNoise.setFrequency(5);
-		m_perlinNoise.setAmplitude(18);
-		m_perlinNoise.setOctaves(4);
-		m_perlinNoise.setExponent(3.5);
-
-		const Type width = numVertices;
-		const Type height = numVertices;
-
-		std::vector<std::vector<Type>> heightmap(width, std::vector<Type>(height));
-
 		// Vertices
 		for (int i = 0; i < numVertices; ++i) {
 			for (int j = 0; j < numVertices; ++j) {
@@ -66,7 +55,6 @@ public:
 				const Type z = j * step;
 				const Type y = 2;
 				m_vertexVect.push_back(Tools::Point3d<Type>{x, y, z});
-
 			}
 		}
 
@@ -90,7 +78,21 @@ public:
 				m_indices.push_back(index3);
 			}
 		}
+
+		m_vertexVect.shrink_to_fit();
+		m_indices.shrink_to_fit();
 	}
+
+	void setWaterSize(int waterSize) {
+
+		m_waterSize = waterSize;
+		m_vertexVect.clear();
+
+		m_indices.clear();
+		m_indices.reserve(1);
+
+		load();
+	};
 
 	void load()
 	{
@@ -107,9 +109,9 @@ public:
 		using vt = vertex_struct_water<Type>;
 		std::vector<vertex_struct_water<Type>> points;
 
-		generateWaterVerticesIndices(WATER_SIZE, WATER_SIZE);
+		generateWaterVerticesIndices(m_waterSize, m_waterSize);
 
-		Tools::Point2d<Type> test{ 0, 0 };
+		Tools::Point2d<Type> test;
 
 		for (Tools::Point3d<float>& p : m_vertexVect)
 		{
@@ -205,8 +207,6 @@ public:
 
 	void update()
 	{
-		/*m_angleX += 0.0125f;
-		m_angleY += 0.025f;*/
 	}
 
 private:
@@ -217,11 +217,12 @@ private:
 	GLuint m_program = 0;
 	GLsizei m_nbVertices;
 
+	float m_waterSize = 1000;
+
 	GLuint m_elementbuffer;
 	std::vector<Tools::Point3d<Type>> m_vertexVect;
 	std::vector<unsigned int> m_indices;
 
-	ProceduralGeneration::PerlinNoise<Type> m_perlinNoise;
 
 	Texture m_textureWater = Texture("Assets/Textures/water.png");
 
