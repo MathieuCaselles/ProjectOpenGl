@@ -21,8 +21,8 @@ MainScene::~MainScene()
 
 void MainScene::onBeginPlay() {
 	sf::Mouse::setPosition(sf::Vector2i(400, 300), m_window);
-	terrain = std::make_unique<Terrainf>();
-	water = std::make_unique<Waterf>();
+	p_terrain = std::make_unique<Terrainf>();
+	p_water = std::make_unique<Waterf>();
 }
 
 void MainScene::processInput(sf::Event& inputEvent)
@@ -79,11 +79,11 @@ void MainScene::processInput(sf::Event& inputEvent)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::T))
 	{
-		terrain->setSeed(124);
-		terrain->setAmplitude(26);
-		terrain->setOctave(2);
-		terrain->setExponent(2.6);
-		terrain->setFrequency(3);
+		p_terrain->setSeed(124);
+		p_terrain->setAmplitude(26);
+		p_terrain->setOctave(2);
+		p_terrain->setExponent(2.6);
+		p_terrain->setFrequency(3);
 	}
 
 	IScene::processInput(inputEvent);
@@ -93,14 +93,14 @@ void MainScene::update(const float& deltaTime)
 {
 	V = Mat4f::rotationX(-m_cameraBeta) * Mat4f::rotationY(-m_cameraAlpha) * Mat4f::translation(-m_cameraPos.x, -m_cameraPos.y, -m_cameraPos.z);
 
-	terrain->update();
-	water->update();
+	p_terrain->update();
+	p_water->update();
 }
 
 void MainScene::render()
 {
-	terrain->render(V, P);
-	water->render(V, P);
+	p_terrain->render(V, P);
+	p_water->render(V, P);
 
 	glFlush();
 }

@@ -45,7 +45,7 @@ private:
     Tools::Mat4<float> P = Tools::Mat4<float>::projection(m_aspect, m_fov, m_f, m_n);
 
     //Terrain
-    std::unique_ptr<Terrainf> terrain;
-    std::unique_ptr<Waterf> water;
+    std::unique_ptr<Terrainf> p_terrain;
+    std::unique_ptr<Waterf> p_water;
 
 };
