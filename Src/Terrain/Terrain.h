@@ -77,6 +77,7 @@ public:
 		}
 
 		// Vertices
+        m_vertexVect.clear();
 		for (int i = 0; i < numVertices; ++i) {
 			for (int j = 0; j < numVertices; ++j) {
 				const Type x = i * step;
@@ -88,6 +89,7 @@ public:
 		}
 
 		// Indices
+        m_indices.clear();
 		for (int i = 0; i < numVertices - 1; ++i) {
 			for (int j = 0; j < numVertices - 1; ++j) {
 
@@ -101,7 +103,7 @@ public:
 				m_indices.push_back(index2);
 				m_indices.push_back(index3);
 
-				// Deuxième triangle
+				// Deuxiï¿½me triangle
 				m_indices.push_back(index2);
 				m_indices.push_back(index4);
 				m_indices.push_back(index3);
@@ -110,42 +112,41 @@ public:
 	}
 
 	void setSeed(int newSeed) {
-		
-		m_perlinNoise.setSeed(newSeed);
-		reloadHeight();
-
+        if (m_perlinNoise.getSeed() != newSeed) {
+            m_perlinNoise.setSeed(newSeed);
+            m_shouldReload = true;
+        }
 	};
 
 	void setFrequency(Type newFrequency) {
-
-		m_perlinNoise.setFrequency(newFrequency);
-		reloadHeight();
-
+        if (m_perlinNoise.getFrequency() != newFrequency) {
+            m_perlinNoise.setFrequency(newFrequency);
+            m_shouldReload = true;
+        }
 	};
 
 	void setAmplitude(Type newAmplitude) {
-
-		m_perlinNoise.setAmplitude(newAmplitude);
-		reloadHeight();
-
+        if (m_perlinNoise.getAmplitude() != newAmplitude) {
+            m_perlinNoise.setAmplitude(newAmplitude);
+            m_shouldReload = true;
+        }
 	};
 
 	void setOctave(int newOctave) {
-
-		m_perlinNoise.setOctaves(newOctave);
-		reloadHeight();
-
+        if (m_perlinNoise.getOctaves() != newOctave) {
+            m_perlinNoise.setOctaves(newOctave);
+            m_shouldReload = true;
+        }
 	};
 
 	void setExponent(Type newExponent) {
-		
-		m_perlinNoise.setExponent(newExponent);
-		reloadHeight();
+        if (m_perlinNoise.getExponent() != newExponent) {
+            m_perlinNoise.setExponent(newExponent);
+            m_shouldReload = true;
+        }
 	};
 
 	void reloadHeight() {
-
-
 		glBindVertexArray(m_vao);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
@@ -203,13 +204,8 @@ public:
 
 		}
 
-
-
 		glUseProgram(m_program);
-
-
 		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_terrain<Type>), points.data(), GL_STATIC_DRAW);
-
 	}
 
 	void load()
@@ -226,6 +222,7 @@ public:
 		generateTerrainVerticesIndices(TERRAIN_SIZE, 1);
 		Tools::Point2d<Type> test{ 0, 0 };
 
+        points.clear();
 		for (Tools::Point3d<float>& p : m_vertexVect)
 		{
 			points.push_back(vt{ p, nyp, vg , test });
@@ -237,9 +234,9 @@ public:
 
 		for (vertex_struct_terrain<Type>& p : points) {
 
-			int xSquare = static_cast<int>((p.p.x + 0.5f) / squareSize);
-			int zSquare = static_cast<int>((p.p.z + 0.5f) / squareSize);
-			p.t = { xSquare * squareSize, zSquare * squareSize };
+			float xSquare = (p.p.x + 0.5f) / squareSize;
+			float zSquare = (p.p.z + 0.5f) / squareSize;
+			p.t = Tools::Point2d<Type>{ Type(xSquare * squareSize), Type(zSquare * squareSize) };
 		}
 
 
@@ -363,6 +360,10 @@ public:
 
 	void update()
 	{
+        if (m_shouldReload) {
+            reloadHeight();
+            m_shouldReload = false;
+        }
 	}
 
 private:
@@ -386,5 +387,5 @@ private:
 	//Texture m_textureStone = Texture("C:/Users/Thomas/Desktop/testTexture.png");
 
 
-
+    bool m_shouldReload = false;
 };

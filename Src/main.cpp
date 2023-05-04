@@ -1,7 +1,7 @@
 #include <Engine/Game/Game.h>
 
 #include "Scenes/SceneEnum.h"
-#include "Scenes/MainScene.h".
+#include "Scenes/MainScene.h"
 
 int main()
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Engine/Scene/Scene.h>
+#include <memory>
 
 #include "Src/Terrain/Terrain.h"
 #include "Src/Terrain/Water.h"
@@ -17,13 +18,14 @@ class MainScene : public Engine::IScene
 public:
 
     MainScene();
-    ~MainScene();
+    ~MainScene() override;
     
     void onBeginPlay() override;
 
     void processInput(sf::Event& inputEvent) override;
     void update(const float& deltaTime) override;
     void render() override;
+    void createUI() override;
 
 private:
 
@@ -48,4 +50,9 @@ private:
     std::unique_ptr<Terrainf> p_terrain;
     std::unique_ptr<Waterf> p_water;
 
+    int m_seed = 666;
+    float m_frequency = 6.f;
+    float m_amplitude = 20.f;
+    int m_octave = 4;
+    float m_exponent = 3.f;
 };

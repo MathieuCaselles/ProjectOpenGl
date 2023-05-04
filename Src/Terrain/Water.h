@@ -121,9 +121,9 @@ public:
 		const float squareSize = 1.0f / (m_nbVertices / 3);
 
 		for (vertex_struct_water<Type>& p : points) {
-			int xSquare = static_cast<int>((p.p.x + 0.5f) / squareSize);
-			int zSquare = static_cast<int>((p.p.z + 0.5f) / squareSize);
-			p.t = { xSquare * squareSize, zSquare * squareSize };
+			float xSquare = (p.p.x + 0.5f) / squareSize;
+			float zSquare = (p.p.z + 0.5f) / squareSize;
+            p.t = Tools::Point2d<Type>{ Type(xSquare * squareSize), Type(zSquare * squareSize) };
 		}
 
 		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_water<Type>), points.data(), GL_STATIC_DRAW);

@@ -2,8 +2,10 @@
 #include <cassert>
 #include "../Scene/Scene.h"
 #include "Tools/MathUtils.h"
+#include "Engine/ImGui/imgui_impl_opengl3.h"
 #include <GL/glew.h>
 #include<SFML/OpenGL.hpp>
+#include <imgui-SFML.h>
 
 namespace Engine {
 
@@ -27,6 +29,8 @@ void Game::run(sf::VideoMode videoMode, std::string windowTitle, sf::Uint32 styl
     glewExperimental = GL_TRUE;
     if (glewInit())
         throw std::runtime_error("Error");
+    ImGui::SFML::Init(m_window);
+    ImGui_ImplOpenGL3_Init();
 
     m_pCurrentScene->onBeginPlay();
 
@@ -42,6 +46,8 @@ void Game::run(sf::VideoMode videoMode, std::string windowTitle, sf::Uint32 styl
         render();
     }
 
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui::SFML::Shutdown();
 }
 
 sf::RenderWindow* Game::getWindow()
@@ -97,6 +103,7 @@ void Game::processInput()
     sf::Event event;
     while (m_window.pollEvent(event))
     {
+        ImGui::SFML::ProcessEvent(m_window, event);
         if (event.type == sf::Event::Closed)
             m_window.close();
         else if (event.type == sf::Event::Resized)
@@ -121,8 +128,10 @@ void Game::render()
     m_window.clear();
 
     m_pCurrentScene->render();
-
     glFlush();
+
+    m_pCurrentScene->renderUI();
+
     m_window.display();
 }
 
