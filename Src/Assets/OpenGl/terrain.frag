@@ -37,8 +37,8 @@ uniform sampler2D texture2;
 uniform sampler2D texture3;
 
 
-float snowHeight = 12.0;
-float stoneAngle = 60.0;
+uniform float snowHeight;
+uniform float stoneAngle;
 
 void main()
 {	
