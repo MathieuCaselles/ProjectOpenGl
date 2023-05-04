@@ -39,6 +39,14 @@ public:
 
 	Terrain()
 	{
+		m_perlinNoise.setAmplitude(20);
+		m_perlinNoise.setPersistance(0.5f);
+		m_perlinNoise.setFrequency(6);
+		m_perlinNoise.setLacunarity(0.8);
+		m_perlinNoise.setOctaves(4);
+		m_perlinNoise.setExponent(3);
+		m_perlinNoise.setFlatFloorLevel(0.1);
+
 		load();
 	}
 
@@ -56,14 +64,6 @@ public:
 
 		const int numVertices = static_cast<int>(size / step) + 1;
 
-		m_perlinNoise.setAmplitude(20);
-		m_perlinNoise.setPersistance(0.5f);
-		m_perlinNoise.setFrequency(6);
-		m_perlinNoise.setLacunarity(0.8);
-		m_perlinNoise.setScale(1);
-		m_perlinNoise.setOctaves(4);
-		m_perlinNoise.setExponent(3);
-		m_perlinNoise.setFlatFloorLevel(0.1);
 
 		const int width = numVertices;
 		const int height = numVertices;
@@ -439,7 +439,6 @@ private:
 	std::vector<unsigned int> m_indices;
 
 	ProceduralGeneration::PerlinNoise<Type> m_perlinNoise;
-	ProceduralGeneration::PerlinNoise<Type> m_perlinNoiseWater;
 
 	Texture m_textureGrass = Texture("Assets/Textures/grass.png");
 	Texture m_textureSnow = Texture("Assets/Textures/snow.png");
