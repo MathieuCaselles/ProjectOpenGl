@@ -2,8 +2,10 @@
 #include <cassert>
 #include "../Scene/Scene.h"
 #include "Tools/MathUtils.h"
-#include <GL/glew.h>
-#include<SFML/OpenGL.hpp>
+//#include <GL/glew.h>
+//#include<SFML/OpenGL.hpp>
+#include "imgui.h"
+#include "imgui-SFML.h"
 
 namespace Engine {
 
@@ -20,28 +22,27 @@ void Game::run(sf::VideoMode videoMode, std::string windowTitle, sf::Uint32 styl
     assert(m_pCurrentScene != nullptr);
 
     initWindow(videoMode, windowTitle, style);
-
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
 
     // fucking lines of hell
-    glewExperimental = GL_TRUE;
-    if (glewInit())
-        throw std::runtime_error("Error");
+    //glewExperimental = GL_TRUE;
+   /* if (glewInit())
+        throw std::runtime_error("Error");*/
 
     m_pCurrentScene->onBeginPlay();
 
     sf::Clock DeltaTimeClock;
 
     while (m_window.isOpen()) {
-        float deltaTime = DeltaTimeClock.restart().asSeconds();
+        sf::Time deltaTime = DeltaTimeClock.restart();
         
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         processInput();
-        update(deltaTime);
+        update(deltaTime.asSeconds(), deltaTime);
         render();
     }
-
+    ImGui::SFML::Shutdown();
 }
 
 sf::RenderWindow* Game::getWindow()
@@ -88,6 +89,8 @@ void Game::initWindow(sf::VideoMode videoMode, std::string windowTitle, sf::Uint
     m_window.create(videoMode, windowTitle, style, settings);
     m_window.setVerticalSyncEnabled(true);
     m_window.setActive(true);
+    ImGui::SFML::Init(m_window);
+
 }
 
 void Game::processInput()
@@ -102,27 +105,27 @@ void Game::processInput()
         else if (event.type == sf::Event::Resized)
         {
             // adjust the viewport when the window is resized
-            glViewport(0, 0, event.size.width, event.size.height);
+            //glViewport(0, 0, event.size.width, event.size.height);
         }
 
         m_pCurrentScene->processInput(event);
     }
 }
 
-void Game::update(const float& deltaTime)
+void Game::update(const float& deltaTime, sf::Time clockRestart)
 {
-    m_pCurrentScene->update(deltaTime);
+    m_pCurrentScene->update(deltaTime, clockRestart);
 }
 
 void Game::render()
 {
     // clear the buffers
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_window.clear();
 
     m_pCurrentScene->render();
 
-    glFlush();
+    //glFlush();
     m_window.display();
 }
 

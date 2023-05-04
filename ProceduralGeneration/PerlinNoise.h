@@ -80,15 +80,12 @@ namespace ProceduralGeneration {
             m_grid.setSeed(seed);
         }
 
-        inline const int& getSeed() const
-        {
-			return m_grid.getSeed();
-		}
-
         inline void setFlatFloorLevel(const Type waterLevel)
         {
             m_flatFloorLevel = waterLevel;
         }
+
+
 
 
 

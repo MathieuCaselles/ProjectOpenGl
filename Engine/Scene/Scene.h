@@ -20,7 +20,7 @@ namespace Engine {
         virtual void onEndPlay();
 
         virtual void processInput(sf::Event& inputEvent);
-        virtual void update(const float& deltaTime);
+        virtual void update(const float& deltaTime, sf::Time clockRestart);
         virtual void render();
 
      

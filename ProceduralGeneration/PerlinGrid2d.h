@@ -45,6 +45,11 @@ public:
 		setPermutationTable();
 	}
 
+	inline const int& getSeed() const
+	{
+		return m_seed;
+	}
+
 
 private:
 	inline void setPermutationTable()

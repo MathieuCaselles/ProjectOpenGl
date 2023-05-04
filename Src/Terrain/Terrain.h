@@ -76,6 +76,40 @@ public:
 			}
 		}
 
+		m_lakeNoise.setAmplitude(5);
+		m_lakeNoise.setFrequency(10);
+		m_lakeNoise.setOctaves(1);
+		m_lakeNoise.setScale(0.5);
+		std::vector<std::vector<Type>> lakeHeightmap(width, std::vector<Type>(height));
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
+				const Type nx = static_cast<Type>(x) / static_cast<Type>(width) - static_cast<Type>(0.5f);
+				const Type ny = static_cast<Type>(y) / static_cast<Type>(height) - static_cast<Type>(0.5f);
+				const Type noiseValue = m_lakeNoise.compute(nx, ny);
+				lakeHeightmap[y][x] = (noiseValue > 0) ? 0 : noiseValue;
+			}
+		}
+
+		// Combine the lake heightmap with the terrain heightmap
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
+				heightmap[y][x] += lakeHeightmap[y][x];
+			}
+		}
+
+		// Create a circle shape for the lake
+		const Type lakeRadius = 50;
+		const int centerX = width / 2;
+		const int centerZ = height / 2;
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
+				const float distance = std::sqrt((x - centerX) * (x - centerX) + (y - centerZ) * (y - centerZ));
+				if (distance < lakeRadius) {
+					heightmap[y][x] = -5; // Set the lake depth
+				}
+			}
+		}
+
 		// Vertices
 		for (int i = 0; i < numVertices; ++i) {
 			for (int j = 0; j < numVertices; ++j) {
@@ -352,6 +386,8 @@ private:
 	std::vector<unsigned int> m_indices;
 
 	ProceduralGeneration::PerlinNoise<Type> m_perlinNoise;
+	ProceduralGeneration::PerlinNoise<Type> m_lakeNoise;
+	;
 
 	Texture m_textureGrass = Texture("Assets/Textures/grass.png");
 	Texture m_textureSnow = Texture("Assets/Textures/snow.png");

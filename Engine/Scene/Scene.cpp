@@ -42,7 +42,7 @@ namespace Engine {
 	{
 	}
 
-	void IScene::update(const float& deltaTime)
+	void IScene::update(const float& deltaTime, sf::Time clockRestart)
 	{
 	}
 

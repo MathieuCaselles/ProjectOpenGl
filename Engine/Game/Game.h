@@ -39,7 +39,7 @@ namespace Engine {
         void initWindow(sf::VideoMode videoMode = sf::VideoMode(1920, 1080), std::string windowTitle = "SFML", sf::Uint32 style = sf::Style::Default, const sf::ContextSettings settings = sf::ContextSettings(24, 8, 4, 4, 6));
 
         void processInput();
-        void update(const float& deltaTime);
+        void update(const float& deltaTime, sf::Time clockRestart);
         void render();
 
 

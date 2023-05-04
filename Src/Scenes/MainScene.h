@@ -22,7 +22,7 @@ public:
     void onBeginPlay() override;
 
     void processInput(sf::Event& inputEvent) override;
-    void update(const float& deltaTime) override;
+    void update(const float& deltaTime, sf::Time clockRestart) override;
     void render() override;
 
 private:
