@@ -47,6 +47,7 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+cmake-build-*
 
 ### CMake Patch ###
 # External projects
@@ -95,6 +96,9 @@ bld/
 [Ll]og/
 [Ll]ogs/
 out/
+
+# Clion
+.idea/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/

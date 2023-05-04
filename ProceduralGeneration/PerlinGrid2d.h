@@ -19,7 +19,7 @@ public:
 		setSeed(seed);
 	};
 
-	inline const Type& getGradientDotProduct(const int& x, const int& y, const Type& distanceX, const Type& distanceY) const
+	inline Type getGradientDotProduct(const int& x, const int& y, const Type& distanceX, const Type& distanceY) const
 	{
 		const Type gradientX[] =
 		{
@@ -39,11 +39,16 @@ public:
 		return distanceX * gradientX[permutedIndex] + distanceY * gradientY[permutedIndex];
 	}
 
-	inline void setSeed(const int seed)
-	{
-		m_seed = seed;
-		setPermutationTable();
-	}
+    inline void setSeed(const int seed)
+    {
+        m_seed = seed;
+        setPermutationTable();
+    }
+
+    inline const int& getSeed() const
+    {
+        return m_seed;
+    }
 
 
 private:

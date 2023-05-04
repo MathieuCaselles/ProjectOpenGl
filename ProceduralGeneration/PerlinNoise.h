@@ -17,7 +17,7 @@ namespace ProceduralGeneration {
         {
         }
 
-        inline const Type& compute(Type x, Type y) 
+        inline const Type compute(Type x, Type y)
         {
             Type noiseValue = 0.0;
             Type amplitude = 1;
@@ -80,20 +80,59 @@ namespace ProceduralGeneration {
             m_grid.setSeed(seed);
         }
 
-        inline const int& getSeed() const
-        {
-			return m_grid.getSeed();
-		}
-
         inline void setFlatFloorLevel(const Type waterLevel)
         {
             m_flatFloorLevel = waterLevel;
         }
 
+        // getters
+        inline const int& getSeed() const
+        {
+            return m_grid.getSeed();
+        }
 
+        inline const Type& getAmplitude() const
+        {
+            return m_amplitude;
+        }
+
+        inline const Type& getPersistance() const
+        {
+            return m_persistance;
+        }
+
+        inline const Type& getFrequency() const
+        {
+            return m_frequency;
+        }
+
+        inline const Type& getLacunarity() const
+        {
+            return m_lacunarity;
+        }
+
+        inline const Type& getScale() const
+        {
+            return m_scale;
+        }
+
+        inline const int& getOctaves() const
+        {
+            return m_octaves;
+        }
+
+        inline const Type& getExponent() const
+        {
+            return m_exponent;
+        };
+
+        inline const Type& getFlatFloorLevel() const
+        {
+            return m_flatFloorLevel;
+        }
 
     private:
-        inline const Type& getPerlinNoise2d(const Type& x, const Type& y)
+        inline Type getPerlinNoise2d(const Type& x, const Type& y)
         {
             // recovery of the cell in which the point given in parameter is located
             const int cellX0 = std::floor(x);
@@ -131,7 +170,7 @@ namespace ProceduralGeneration {
         }
 
         // raise the elevation to a power
-        inline const Type& redistribution(const Type& noiseValue) const
+        inline Type redistribution(const Type& noiseValue) const
         {
             return std::pow(noiseValue, m_exponent);
         }

@@ -12,13 +12,12 @@ endif()
 
 project (ProjectOpenGl)
 
-
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux")
 #permet d'avoir un dossier bin qui se suffit à lui même pour envoyer un exécutable
 include(build_configuration)
-
-
 
 add_library(project_options INTERFACE)
 target_compile_features(project_options INTERFACE cxx_std_20)
