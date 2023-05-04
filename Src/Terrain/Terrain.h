@@ -54,11 +54,13 @@ public:
 	{
 		const int numVertices = static_cast<int>(size / step) + 1;
 
-		m_perlinNoise.setFrequency(5);
+		m_perlinNoise.setAmplitude(20);
+		m_perlinNoise.setPersistance(0.5f);
+		m_perlinNoise.setFrequency(6);
+		m_perlinNoise.setLacunarity(0.8);
 		m_perlinNoise.setScale(1);
-		m_perlinNoise.setAmplitude(18);
 		m_perlinNoise.setOctaves(4);
-		m_perlinNoise.setExponent(3.5);
+		m_perlinNoise.setExponent(3);
 		m_perlinNoise.setFlatFloorLevel(0.2);
 
 		const Type width = numVertices;
