@@ -33,6 +33,8 @@ private:
     float m_cameraBeta; //PITCH
     float m_cameraSpeed;
 
+    bool m_mouseLocked = true;
+
     Mat4f V;
 
     const float m_aspect;
