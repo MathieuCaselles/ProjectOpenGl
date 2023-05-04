@@ -5,6 +5,7 @@
 
 #include "imgui.h"
 #include "imgui-SFML.h"
+#include "Src/ImGui/helper.h"
 
 using Point3f = Tools::Point3d<float>;
 using Mat4f = Tools::Mat4<float>;
@@ -81,40 +82,6 @@ void MainScene::processInput(sf::Event& inputEvent)
 		}
 
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
-	{
-		p_terrain->showPoint();
-	}if (sf::Keyboard::isKeyPressed(sf::Keyboard::O))
-	{
-		p_terrain->showPolygon();
-	}if (sf::Keyboard::isKeyPressed(sf::Keyboard::F))
-	{
-		p_terrain->showFill();
-	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::N))
-	{
-		p_terrain->setSnowHeight(8);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::B))
-	{
-		p_terrain->setStoneAngle(30);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::J))
-	{
-		p_terrain->setTerrainSize(100);
-		p_water->setWaterSize(100);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-	{
-		p_terrain->setWaterHeight(10);
-		p_water->setWaterHeight(10);
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::C))
-	{
-		p_water->setWaterClearness(0.1); // Entre 0 et 1
-	}
-
 
 	IScene::processInput(inputEvent);
 }
@@ -130,8 +97,40 @@ void MainScene::update(const float& deltaTime)
     p_terrain->setOctave(m_octave);
     p_terrain->setExponent(m_exponent);
 
-	p_terrain->update();
-	p_water->update();
+    switch (m_drawMode) {
+        case 0:
+            p_terrain->showPoint();
+            break;
+        case 1:
+            p_terrain->showPolygon();
+            break;
+        default:
+            p_terrain->showFill();
+        break;
+    }
+
+    p_terrain->setSnowHeight(m_snowHeight);
+    p_terrain->setStoneAngle(m_stoneAngle);
+    p_terrain->setWaterHeight(m_waterHeight);
+
+    p_water->setWaterHeight(m_waterHeight);
+    p_water->setWaterClearness(m_waterClearness);
+
+    // last because it triggers full reload
+    p_terrain->setTerrainSize(m_terrainSize);
+    p_water->setWaterSize(m_waterSize);
+
+    p_terrain->update(deltaTime);
+    p_water->update();
+
+    m_elapsedTimeSinceLastSecond += deltaTime;
+    if (m_elapsedTimeSinceLastSecond >= 1.f) {
+        m_elapsedTimeSinceLastSecond = 0;
+        m_framesPerSeconds = m_numberOfFramesSinceLastSecond;
+        m_numberOfFramesSinceLastSecond = 0;
+    } else {
+        m_numberOfFramesSinceLastSecond++;
+    }
 }
 
 void MainScene::render()
@@ -141,14 +140,58 @@ void MainScene::render()
 }
 
 void MainScene::createUI() {
-    IScene::createUI();
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, {200.f, 300.f});
-    ImGui::Begin("Procedural generation configuration", nullptr, ImGuiWindowFlags_NoCollapse );
+    ImGui::PushStyleColor(ImGuiCol_TitleBgActive, (ImVec4)ImColor(m_themeColor[0], m_themeColor[1], m_themeColor[2]));
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor(m_themeColor[0], m_themeColor[1], m_themeColor[2]));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, (ImVec4)ImColor(getTintFromColor(m_themeColor[0], 1.2f), getTintFromColor(m_themeColor[1], 1.2f), getTintFromColor(m_themeColor[2], 1.2f)));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, (ImVec4)ImColor(getTintFromColor(m_themeColor[0], 1.2f), getTintFromColor(m_themeColor[1], 1.2f), getTintFromColor(m_themeColor[2], 1.2f)));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrab, (ImVec4)ImColor(getTintFromColor(m_themeColor[0], 1.5f), getTintFromColor(m_themeColor[1], 1.5f), getTintFromColor(m_themeColor[2], 1.5f)));
+    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, (ImVec4)ImColor(getTintFromColor(m_themeColor[0], 1.6f), getTintFromColor(m_themeColor[1], 1.6f), getTintFromColor(m_themeColor[2], 1.6f)));
+    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor(m_themeColor[0], m_themeColor[1], m_themeColor[2]));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor(getTintFromColor(m_themeColor[0], 1.2f), getTintFromColor(m_themeColor[1], 1.2f), getTintFromColor(m_themeColor[2], 1.2f)));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor(getTintFromColor(m_themeColor[0], 1.2f), getTintFromColor(m_themeColor[1], 1.2f), getTintFromColor(m_themeColor[2], 1.2f)));
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, {400.f, 200.f});
+    ImGui::Begin("Procedural generation configuration");
     ImGui::PopStyleVar();
+
+    ImGui::SeparatorText("Terrain");
+    ImGui::SliderInt("Terrain size", &m_terrainSize, 1, 10000);
+    ImGui::SliderInt("Water size", &m_waterSize, 1, 10000);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Should be the same as terrain size, but you can try to play with it.");
+    ImGui::SliderFloat("Water clearness", &m_waterClearness, 0.f, 1.f);
+    ImGui::RadioButton("Draw points", &m_drawMode, 0);
+    ImGui::SameLine(); ImGui::RadioButton("Draw polygons", &m_drawMode, 1);
+    ImGui::SameLine(); ImGui::RadioButton("Draw filled", &m_drawMode, 2);
+
+    ImGui::SeparatorText("Perlin noise");
     ImGui::InputInt("Seed", &m_seed);
-    ImGui::InputFloat("Frequency", &m_frequency);
-    ImGui::InputFloat("Amplitude", &m_amplitude);
-    ImGui::InputInt("Octave", &m_octave);
-    ImGui::InputFloat("Exponent", &m_exponent);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes the seed. Same seed will always produce the same map.");
+    ImGui::SliderFloat("Frequency", &m_frequency, 0.001f, 100.f);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes sampling frequency.");
+    ImGui::SliderFloat("Amplitude", &m_amplitude, 0.f, 100.f);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes the maximum height amplitude.");
+    ImGui::SliderInt("Octave", &m_octave, 1, 20);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes the number of octaves used to generate the final perlin noise.");
+    ImGui::SliderFloat("Exponent", &m_exponent, 0.f, 100.f);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Applies the exponent on redistribution.");
+    ImGui::SeparatorText("Additional configuration");
+    ImGui::SliderFloat("Snow height", &m_snowHeight, 0.f, 100.f);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Defines when to start rendering snow.");
+    ImGui::SliderFloat("Stone angle", &m_stoneAngle, 0.f, 100.f);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Defines when to start rendering stone instead of grass based on angle of vertex.");
+    ImGui::SliderFloat("Water height", &m_waterHeight, 0.f, 100.f);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Defines when to start rendering water.");
     ImGui::End();
+
+    ImGui::Begin("Theme");
+    ImGui::ColorPicker3("Color", &m_themeColor[0], ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+    ImGui::End();
+
+    ImGui::Begin("Performance");
+    ImGui::Text("%i FPS", m_framesPerSeconds);
+    ImGui::Text("%i Terrain Primitives", (unsigned int) p_terrain->getPrimitivesCount());
+    ImGui::Text("%i Water Primitives", (unsigned int) p_water->getPrimitivesCount());
+    ImGui::End();
+
+    ImGui::PopStyleColor(9);
 }
