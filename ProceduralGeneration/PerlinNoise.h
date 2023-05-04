@@ -153,6 +153,7 @@ namespace ProceduralGeneration {
 
         inline void setSeed(const int seed)
         {
+            m_gen.seed(seed);
             m_grid.setSeed(seed);
         }
 
