@@ -103,13 +103,13 @@ public:
 		glBindVertexArray(m_vao);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-		for (vertex_struct_water<Type>& p : points) {
+		for (vertex_struct_water<Type>& p : m_points) {
 
 			p.p.y = m_waterHeight;
 		}
 
 		glUseProgram(m_program);
-		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_terrain<Type>), points.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_terrain<Type>), m_points.data(), GL_STATIC_DRAW);
 	}
 
 	void setWaterClearness(float clearness) {
@@ -136,20 +136,20 @@ public:
 
 		for (Tools::Point3d<float>& p : m_vertexVect)
 		{
-			points.push_back(vt{ p, nyn, vb , test });
+			m_points.push_back(vt{ p, nyn, vb , test });
 		}
 
-		m_nbVertices = static_cast<GLsizei>(points.size());
+		m_nbVertices = static_cast<GLsizei>(m_points.size());
 
 		const float squareSize = 1.0f / (m_nbVertices / 3);
 
-		for (vertex_struct_water<Type>& p : points) {
+		for (vertex_struct_water<Type>& p : m_points) {
 			float xSquare = (p.p.x + 0.5f) / squareSize;
 			float zSquare = (p.p.z + 0.5f) / squareSize;
             p.t = Tools::Point2d<Type>{ Type(xSquare * squareSize), Type(zSquare * squareSize) };
 		}
 
-		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_water<Type>), points.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_water<Type>), m_points.data(), GL_STATIC_DRAW);
 
 		ShaderInfo shaders[] = {
 			{GL_VERTEX_SHADER, "Assets/OpenGl/water.vert"},
@@ -252,7 +252,7 @@ private:
 	GLuint m_elementbuffer;
 	std::vector<Tools::Point3d<Type>> m_vertexVect;
 	std::vector<unsigned int> m_indices;
-	std::vector<vertex_struct_water<Type>> points;
+	std::vector<vertex_struct_water<Type>> m_points;
 
 
 
