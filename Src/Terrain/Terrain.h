@@ -165,6 +165,7 @@ public:
 	void setSeed(int newSeed) {
         if (m_perlinNoise.getSeed() != newSeed) {
             m_perlinNoise.setSeed(newSeed);
+            m_elapsedTimeSinceShouldReload = 0.f;
             m_shouldReload = true;
         }
 	};
@@ -172,6 +173,7 @@ public:
 	void setFrequency(Type newFrequency) {
         if (m_perlinNoise.getFrequency() != newFrequency) {
             m_perlinNoise.setFrequency(newFrequency);
+            m_elapsedTimeSinceShouldReload = 0.f;
             m_shouldReload = true;
         }
 	};
@@ -179,6 +181,7 @@ public:
 	void setAmplitude(Type newAmplitude) {
         if (m_perlinNoise.getAmplitude() != newAmplitude) {
             m_perlinNoise.setAmplitude(newAmplitude);
+            m_elapsedTimeSinceShouldReload = 0.f;
             m_shouldReload = true;
         }
 	};
@@ -186,6 +189,7 @@ public:
 	void setOctave(int newOctave) {
         if (m_perlinNoise.getOctaves() != newOctave) {
             m_perlinNoise.setOctaves(newOctave);
+            m_elapsedTimeSinceShouldReload = 0.f;
             m_shouldReload = true;
         }
 	};
@@ -193,6 +197,7 @@ public:
 	void setExponent(Type newExponent) {
         if (m_perlinNoise.getExponent() != newExponent) {
             m_perlinNoise.setExponent(newExponent);
+            m_elapsedTimeSinceShouldReload = 0.f;
             m_shouldReload = true;
         }
 	};
@@ -218,14 +223,11 @@ public:
 	}
 
 	void setTerrainSize(int terrainSize) {
+        if (m_terrainSize != terrainSize) {
+            m_terrainSize = terrainSize;
 
-		m_terrainSize = terrainSize;
-
-		m_vertexVect.clear();
-		m_points.clear();
-		m_indices.clear();
-
-		load();
+            load();
+        }
 	};
 
 	void setWaterHeight(float waterHeight) {
@@ -296,6 +298,9 @@ public:
 
 	void load()
 	{
+        m_shouldReload = false;
+        m_elapsedTimeSinceShouldReload = 0.f;
+
 		glGenVertexArrays(1, &m_vao);
 		glBindVertexArray(m_vao);
 
@@ -456,13 +461,24 @@ public:
 		);
 	}
 
-	void update()
+	void update(const float& deltaTime)
 	{
         if (m_shouldReload) {
-            reloadHeight();
-            m_shouldReload = false;
+            m_elapsedTimeSinceShouldReload += deltaTime;
+            // reload only after some time
+            if (m_elapsedTimeSinceShouldReload >= m_debounceReloadSeconds) {
+                reloadHeight();
+                m_shouldReload = false;
+                m_elapsedTimeSinceShouldReload = 0.f;
+            }
         }
 	}
+
+    inline size_t getPrimitivesCount() const
+    {
+        // we have triangles
+        return m_indices.size() / 3;
+    }
 
 private:
 	Type m_angleX = 0;
@@ -493,6 +509,7 @@ private:
 
 	//Texture m_textureStone = Texture("C:/Users/Thomas/Desktop/testTexture.png");
 
-
     bool m_shouldReload = false;
+    float m_elapsedTimeSinceShouldReload = 0.f;
+    static constexpr float m_debounceReloadSeconds = 1.f;
 };

@@ -15,11 +15,11 @@ target_include_directories(ProjectOpenGl PUBLIC
 )
 
 target_sources(ProjectOpenGl PRIVATE
-  "main.cpp"
-  "Scenes/SceneEnum.h" "Scenes/MainScene.h"  "Scenes/MainScene.cpp"
+    "main.cpp"
+    "Scenes/SceneEnum.h" "Scenes/MainScene.h"  "Scenes/MainScene.cpp"
 
     "Terrain/Terrain.h"
     "Terrain/Shader.h" "Terrain/Shader.cpp"
     "Terrain/Water.h" "Terrain/Texture.h"
-
+    "ImGui/helper.h"
 )
