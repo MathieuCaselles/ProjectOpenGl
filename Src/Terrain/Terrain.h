@@ -75,6 +75,56 @@ public:
 			}
 		}
 
+		m_perlinNoiseWater.setAmplitude(1);
+		m_perlinNoiseWater.setPersistance(0.5f);
+		m_perlinNoiseWater.setFrequency(1);
+		m_perlinNoiseWater.setLacunarity(1.5);
+		m_perlinNoiseWater.setScale(1);
+		m_perlinNoiseWater.setOctaves(1);
+		m_perlinNoiseWater.setExponent(1);
+
+		// Créer des lacs aléatoirement sur les zones plates
+
+
+		const Type flatFloorLevel = 0.5 * m_perlinNoise.getAmplitude();
+		const float lakeProbability = 0.0001f; // probabilité de créer un lac dans une zone plate donnée
+
+
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
+				const Type currentHeight = heightmap[y][x];
+				if (currentHeight <= flatFloorLevel) { // Vérifie si la hauteur est plate
+					if ((float)rand() / (float)RAND_MAX < lakeProbability) { // Détermine aléatoirement si un lac doit être créé
+
+						std::random_device rd;
+						std::mt19937 gen(rd());
+						std::uniform_int_distribution<int> dis(5, 60);
+						const Type lakeRadius= dis(gen);
+
+						std::random_device rd2;
+						std::mt19937 gen2(rd2());
+						std::uniform_int_distribution<int> dis2(5, 20);
+						const Type lakeDepth = dis2(gen);
+
+						const Type lakeCenterDepth = currentHeight + lakeDepth;
+
+						for (int dy = -lakeRadius; dy <= lakeRadius; ++dy) {
+							for (int dx = -lakeRadius; dx <= lakeRadius; ++dx) {
+								const int nx = x + dx;
+								const int ny = y + dy;
+								const Type noiseWater = m_perlinNoiseWater.compute(nx, ny);
+								if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+								const Type distance = sqrt(dx * dx + dy * dy);
+								if (distance <= lakeRadius) {
+									heightmap[ny][nx] -= lakeCenterDepth * (1 - distance / lakeRadius);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 		// Vertices
         m_vertexVect.clear();
 		for (int i = 0; i < numVertices; ++i) {
@@ -203,7 +253,7 @@ public:
 
 		for (vertex_struct_terrain<Type>& p : m_points) {
 
-			p.p.y = heightmap[p.p.z][p.p.x] - 15;
+			p.p.y = heightmap[p.p.z][p.p.x];
 		}
 
 		for (int i = 2; i < m_indices.size(); i += 3) {
@@ -434,6 +484,7 @@ private:
 	std::vector<unsigned int> m_indices;
 
 	ProceduralGeneration::PerlinNoise<Type> m_perlinNoise;
+	ProceduralGeneration::PerlinNoise<Type> m_perlinNoiseWater;
 
 	Texture m_textureGrass = Texture("Assets/Textures/grass.png");
 	Texture m_textureSnow = Texture("Assets/Textures/snow.png");

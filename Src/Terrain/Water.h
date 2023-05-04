@@ -84,11 +84,12 @@ public:
 	}
 
 	void setWaterSize(int waterSize) {
-
 		m_waterSize = waterSize;
-		m_vertexVect.clear();
 
+		m_vertexVect.clear();
+		m_points.clear();
 		m_indices.clear();
+
 		m_indices.reserve(1);
 
 		load();
@@ -244,7 +245,7 @@ private:
 	GLsizei m_nbVertices;
 
 	float m_waterSize = 1000;
-	float m_waterHeight = 8;
+	float m_waterHeight = 3.5;
 	float m_waterClearness = 0.5;
 
 	bool m_shouldReload = false;
