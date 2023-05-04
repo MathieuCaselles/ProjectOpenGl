@@ -32,13 +32,15 @@ struct DirectionalLight
 uniform Material material;
 uniform DirectionalLight light;
 uniform Camera camera;
-uniform sampler2D texture1;
-uniform sampler2D texture2;
-uniform sampler2D texture3;
+uniform sampler2D textureGrass;
+uniform sampler2D textureSnow;
+uniform sampler2D textureStone;
+uniform sampler2D textureSand;
 
 
 uniform float snowHeight;
 uniform float stoneAngle;
+uniform float waterHeight;
 
 void main()
 {	
@@ -47,28 +49,41 @@ void main()
 	vec3 pprime = 2 * h - light.direction;
 	vec3 specular = light.color * pow(max(0, dot(worldEye, pprime)), material.specularSmoothness) * material.specular;
 
-	vec4 texColor1 = texture(texture1, iTexCoord);
-	vec4 texColor2 = texture(texture2, iTexCoord);
-	vec4 texColor3 = texture(texture3, iTexCoord);
+	vec4 texGrassColor = texture(textureGrass, iTexCoord);
+	vec4 texSnowColor = texture(textureSnow, iTexCoord);
+	vec4 texStoneColor = texture(textureStone, iTexCoord);
+	vec4 texSandColor = texture(textureSand, iTexCoord);
 
 
 	vec4 color = vec4(0.0);
 	float angle = degrees(acos(dot(iWorldNormal, vec3(0, -1, 0))));
 
-	if (angle > stoneAngle && iHeight < snowHeight) {
-		color = texColor3;
+	if (angle > stoneAngle && iHeight < snowHeight && iHeight > waterHeight + 1) {
+		color = texStoneColor;
 	} else {
-		if (iHeight > snowHeight) {
-			color = mix(texColor3, texColor2, smoothstep(snowHeight, snowHeight + 4, iHeight));
+		if (iHeight > snowHeight && iHeight > waterHeight) {
+			color = mix(texStoneColor, texSnowColor, smoothstep(snowHeight, snowHeight + 4, iHeight));
+		} else if(iHeight < waterHeight + 1)
+		{
+			color = mix(texGrassColor, texSandColor, smoothstep(waterHeight + 1, waterHeight , iHeight));
+			
 		} else {
-			color = texColor1;
+			color = texGrassColor;
 		}
 	}
 
-
 	vec3 ambient = material.ambient * color.rgb;
 	vec3 diffuse = max(0, -dot(iWorldNormal, light.direction)) * light.color * color.rgb;
+	
+	if(iHeight > waterHeight){
+		
+		fragColor = vec4(ambient + diffuse + specular / 2, 1.f) + color;
 
-	fragColor = vec4(ambient + diffuse + specular, 1.f) + color;
+	}else{
+		fragColor = vec4(ambient + diffuse, 1.f) + color;
+	
+	}
+	
+	
 
 }

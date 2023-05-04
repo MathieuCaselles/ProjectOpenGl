@@ -172,11 +172,15 @@ public:
 		m_terrainSize = terrainSize;
 
 		m_vertexVect.clear();
-		points.clear();
+		m_points.clear();
 		m_indices.clear();
 
 		load();
 	};
+
+	void setWaterHeight(float waterHeight) {
+		m_waterHeight = waterHeight;
+	}
 
 	void reloadHeight() {
 		glBindVertexArray(m_vao);
@@ -197,7 +201,7 @@ public:
 			}
 		}
 
-		for (vertex_struct_terrain<Type>& p : points) {
+		for (vertex_struct_terrain<Type>& p : m_points) {
 
 			p.p.y = heightmap[p.p.z][p.p.x] - 15;
 		}
@@ -205,9 +209,9 @@ public:
 		for (int i = 2; i < m_indices.size(); i += 3) {
 
 			int index = m_indices.at(i);
-			vt& p3 = points.at(m_indices.at(i));
-			vt& p2 = points.at(m_indices.at(i - 1));
-			vt& p1 = points.at(m_indices.at(i - 2));
+			vt& p3 = m_points.at(m_indices.at(i));
+			vt& p2 = m_points.at(m_indices.at(i - 1));
+			vt& p1 = m_points.at(m_indices.at(i - 2));
 
 			Tools::Point3d<Type> vec12 = { p2.p.x - p1.p.x, p2.p.y - p1.p.y, p2.p.z - p1.p.z };
 			Tools::Point3d<Type> vec13 = { p3.p.x - p1.p.x, p3.p.y - p1.p.y, p3.p.z - p1.p.z };
@@ -237,7 +241,7 @@ public:
 		}
 
 		glUseProgram(m_program);
-		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_terrain<Type>), points.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_terrain<Type>), m_points.data(), GL_STATIC_DRAW);
 	}
 
 	void load()
@@ -255,19 +259,19 @@ public:
 		generateTerrainVerticesIndices(m_terrainSize, 1);
 		
 
-        points.clear();
+        m_points.clear();
 		for (Tools::Point3d<float>& p : m_vertexVect)
 		{
-			points.push_back(vt{ p, nyp, vg , texCoord });
+			m_points.push_back(vt{ p, nyp, vg , texCoord });
 		}
 
-		points.shrink_to_fit();
+		m_points.shrink_to_fit();
 
-		m_nbVertices = static_cast<GLsizei>(points.size());
+		m_nbVertices = static_cast<GLsizei>(m_points.size());
 
 		const float squareSize = 1.0f / (m_nbVertices / 3);
 
-		for (vertex_struct_terrain<Type>& p : points) {
+		for (vertex_struct_terrain<Type>& p : m_points) {
 
 			float xSquare = (p.p.x + 0.5f) / squareSize;
 			float zSquare = (p.p.z + 0.5f) / squareSize;
@@ -278,9 +282,9 @@ public:
 		for (int i = 2; i < m_indices.size(); i += 3) {
 
 			int index = m_indices.at(i);
-			vt& p3 = points.at(m_indices.at(i));
-			vt& p2 = points.at(m_indices.at(i - 1));
-			vt& p1 = points.at(m_indices.at(i - 2));
+			vt& p3 = m_points.at(m_indices.at(i));
+			vt& p2 = m_points.at(m_indices.at(i - 1));
+			vt& p1 = m_points.at(m_indices.at(i - 2));
 
 			Tools::Point3d<Type> vec12 = { p2.p.x - p1.p.x, p2.p.y - p1.p.y, p2.p.z - p1.p.z };
 			Tools::Point3d<Type> vec13 = { p3.p.x - p1.p.x, p3.p.y - p1.p.y, p3.p.z - p1.p.z };
@@ -310,7 +314,7 @@ public:
 
 		}
 
-		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_terrain<Type>), points.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_terrain<Type>), m_points.data(), GL_STATIC_DRAW);
 
 		ShaderInfo shaders[] = {
 			{GL_VERTEX_SHADER, "Assets/OpenGl/terrain.vert"},
@@ -368,6 +372,7 @@ public:
 
 		glUniform1f(glGetUniformLocation(m_program, "snowHeight"), m_snowHeight);
 		glUniform1f(glGetUniformLocation(m_program, "stoneAngle"), m_stoneAngle);
+		glUniform1f(glGetUniformLocation(m_program, "waterHeight"), m_waterHeight);
 
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
@@ -381,12 +386,17 @@ public:
 		glActiveTexture(GL_TEXTURE2);
 		m_textureStone.bind();
 
-		GLint texture1Loc = glGetUniformLocation(m_program, "texture1");
-		GLint texture2Loc = glGetUniformLocation(m_program, "texture2");
-		GLint texture3Loc = glGetUniformLocation(m_program, "texture3"); // Revoir le nomage
+		glActiveTexture(GL_TEXTURE3);
+		m_textureSand.bind();
+
+		GLint texture1Loc = glGetUniformLocation(m_program, "textureGrass");
+		GLint texture2Loc = glGetUniformLocation(m_program, "textureSnow");
+		GLint texture3Loc = glGetUniformLocation(m_program, "textureStone");
+		GLint texture4Loc = glGetUniformLocation(m_program, "textureSand");
 		glUniform1i(texture1Loc, 0);
 		glUniform1i(texture2Loc, 1);
 		glUniform1i(texture3Loc, 2);
+		glUniform1i(texture4Loc, 3);
 
 		glDrawElements(
 			GL_TRIANGLES,      // mode
@@ -416,10 +426,11 @@ private:
 
 	float m_snowHeight = 30;
 	float m_stoneAngle = 60;
+	float m_waterHeight = 8;
 
 	GLuint m_elementbuffer;
 	std::vector<Tools::Point3d<Type>> m_vertexVect;
-	std::vector<vertex_struct_terrain<Type>> points;
+	std::vector<vertex_struct_terrain<Type>> m_points;
 	std::vector<unsigned int> m_indices;
 
 	ProceduralGeneration::PerlinNoise<Type> m_perlinNoise;
@@ -427,6 +438,8 @@ private:
 	Texture m_textureGrass = Texture("Assets/Textures/grass.png");
 	Texture m_textureSnow = Texture("Assets/Textures/snow.png");
 	Texture m_textureStone = Texture("Assets/Textures/stone.png");
+	Texture m_textureSand = Texture("Assets/Textures/sand.png");
+
 	//Texture m_textureStone = Texture("C:/Users/Thomas/Desktop/testTexture.png");
 
 

@@ -105,6 +105,16 @@ void MainScene::processInput(sf::Event& inputEvent)
 		p_terrain->setTerrainSize(100);
 		p_water->setWaterSize(100);
 	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	{
+		p_terrain->setWaterHeight(10);
+		p_water->setWaterHeight(10);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::C))
+	{
+		p_water->setWaterClearness(0.1); // Entre 0 et 1
+	}
+
 
 	IScene::processInput(inputEvent);
 }
