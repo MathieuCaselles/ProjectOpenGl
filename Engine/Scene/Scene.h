@@ -22,15 +22,14 @@ namespace Engine {
         virtual void processInput(sf::Event& inputEvent);
         virtual void update(const float& deltaTime);
         virtual void render();
+        void renderUI();
 
-     
         sf::RenderWindow& getWindow();
 
-
-
     protected:
-        sf::RenderWindow& m_window;
+        virtual void createUI();
 
+        sf::RenderWindow& m_window;
     };
 
 

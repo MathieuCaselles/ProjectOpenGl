@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.8)
 
 
 add_library(Tools)
-add_library(testCmakeVcpkg2::Tools ALIAS Tools)
+add_library(ProjectOpenGl::Tools ALIAS Tools)
 
 target_link_libraries(Tools PUBLIC
     project_options

@@ -1,14 +1,12 @@
 cmake_minimum_required (VERSION 3.8)
 
 add_library(Engine)
-add_library(testCmakeVcpkg2::Engine ALIAS Engine)
+add_library(ProjectOpenGl::Engine ALIAS Engine)
 
 find_package(GLEW REQUIRED)
 find_package(SFML COMPONENTS system window graphics CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
-find_package(SFML CONFIG REQUIRED COMPONENTS graphics system window)
 find_package(ImGui-SFML CONFIG REQUIRED)
-
 
 
 target_link_libraries(Engine PUBLIC
@@ -26,4 +24,5 @@ target_include_directories(Engine PUBLIC
 target_sources(Engine PRIVATE
     "Game/Game.h" "Game/Game.cpp"
     "Scene/Scene.h" "Scene/Scene.cpp"
+    "ImGui/imgui_impl_opengl3.cpp" "ImGui/imgui_impl_opengl3.h" "ImGui/imgui_impl_opengl3_loader.h" "ImGui/imgui_impl_opengl3_render.cpp"
 )

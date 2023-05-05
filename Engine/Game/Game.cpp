@@ -1,7 +1,11 @@
 #include "Game.h"
 #include <cassert>
 #include "../Scene/Scene.h"
-#include <iostream>
+#include "Tools/MathUtils.h"
+#include "Engine/ImGui/imgui_impl_opengl3.h"
+#include <GL/glew.h>
+#include<SFML/OpenGL.hpp>
+#include <imgui-SFML.h>
 
 namespace Engine {
 
@@ -19,13 +23,16 @@ void Game::run(sf::VideoMode videoMode, std::string windowTitle, sf::Uint32 styl
 
     initWindow(videoMode, windowTitle, style);
 
+    glEnable(GL_DEPTH_TEST);
 
     // fucking lines of hell
     glewExperimental = GL_TRUE;
     if (glewInit())
-        throw std::runtime_error("Error");
+        throw std::runtime_error("Error on glew init");
+    if (!ImGui::SFML::Init(m_window))
+        throw std::runtime_error("Error on imgui init");
 
-
+    ImGui_ImplOpenGL3_Init();
 
     m_pCurrentScene->onBeginPlay();
 
@@ -33,12 +40,16 @@ void Game::run(sf::VideoMode videoMode, std::string windowTitle, sf::Uint32 styl
 
     while (m_window.isOpen()) {
         float deltaTime = DeltaTimeClock.restart().asSeconds();
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         processInput();
         update(deltaTime);
         render();
     }
 
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui::SFML::Shutdown();
 }
 
 sf::RenderWindow* Game::getWindow()
@@ -84,6 +95,7 @@ void Game::initWindow(sf::VideoMode videoMode, std::string windowTitle, sf::Uint
 {
     m_window.create(videoMode, windowTitle, style, settings);
     m_window.setVerticalSyncEnabled(true);
+    m_window.setActive(true);
 }
 
 void Game::processInput()
@@ -93,7 +105,7 @@ void Game::processInput()
     sf::Event event;
     while (m_window.pollEvent(event))
     {
-        std::cout << "event" << std::endl;
+        ImGui::SFML::ProcessEvent(m_window, event);
         if (event.type == sf::Event::Closed)
             m_window.close();
         else if (event.type == sf::Event::Resized)
@@ -118,8 +130,10 @@ void Game::render()
     m_window.clear();
 
     m_pCurrentScene->render();
-
     glFlush();
+
+    m_pCurrentScene->renderUI();
+
     m_window.display();
 }
 

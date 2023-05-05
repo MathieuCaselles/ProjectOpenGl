@@ -3,8 +3,7 @@
 #include <Tools/DesignPatterns/Singleton.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
-#include <GL/glew.h>
-#include<SFML/OpenGL.hpp>
+
 
 
 

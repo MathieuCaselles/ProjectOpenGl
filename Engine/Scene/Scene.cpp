@@ -1,4 +1,6 @@
+#include <imgui-SFML.h>
 #include "Scene.h"
+#include "../ImGui/imgui_impl_opengl3_render.cpp"
 
 #include "../Game/Game.h"
 
@@ -28,8 +30,6 @@ namespace Engine {
 		return m_window.mapPixelToCoords(sf::Mouse::getPosition(m_window));
 	}
 
-
-
 	void IScene::onBeginPlay() {
 	}
 
@@ -44,6 +44,7 @@ namespace Engine {
 
 	void IScene::update(const float& deltaTime)
 	{
+        ImGui::SFML::OpenGL3::Update(m_window, sf::seconds(deltaTime));
 	}
 
 	void IScene::render()
@@ -53,5 +54,13 @@ namespace Engine {
 	sf::RenderWindow& IScene::getWindow()
 	{
 		return m_window;
+	}
+
+	void IScene::renderUI() {
+		createUI();
+		ImGui::SFML::OpenGL3::Render(m_window);
+	}
+
+	void IScene::createUI() {
 	}
 }
