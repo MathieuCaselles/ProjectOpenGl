@@ -26,13 +26,14 @@ namespace ProceduralGeneration {
             , m_octaves(1)
             , m_exponent(1)
             , m_flatFloorLevel(0)
-            , m_lakeLevel(10)
             , m_gen(seed)
             , m_probabilityOfALakeAppearing(0.0001f)
             , m_maximumLakeRadius(80)
             , m_minimumLakeRadius(10)
             , m_maximumLakeDepth(20)
             , m_minimumLakeDepth(5)
+            , m_heightOfTheLakeshore(6.5f)
+            , m_waterHeight(3.5f)
         {
         }
 
@@ -84,7 +85,7 @@ namespace ProceduralGeneration {
             for (int y = 0; y < height; ++y) {
                 for (int x = 0; x < width; ++x) {
                     const Type currentHeight = heightmap[y][x];
-                    if (currentHeight <= m_lakeLevel) {
+                    if (currentHeight <= m_waterHeight + m_heightOfTheLakeshore) {
 
                         if (disLakeProbability(m_gen) < m_probabilityOfALakeAppearing) {
                             const Type lakeRadius = disLakeRadius(m_gen);
@@ -162,6 +163,53 @@ namespace ProceduralGeneration {
             m_flatFloorLevel = waterLevel;
         }
 
+        /*fait les setter manqunant de : 
+        Type m_heightOfTheLakeshore;
+        Type m_waterHeight;
+
+
+        float m_probabilityOfALakeAppearing;
+        int m_maximumLakeRadius;
+        int m_minimumLakeRadius;
+        int m_maximumLakeDepth;
+        int m_minimumLakeDepth;*/ 
+
+        inline void setHeightOfTheLakeshore(const Type height)
+        {
+			m_heightOfTheLakeshore = height;
+		}
+
+        inline void setWaterHeight(const Type height)
+        {
+            m_waterHeight = height;
+        }
+
+        inline void setProbabilityOfALakeAppearing(const float probability)
+        {
+			m_probabilityOfALakeAppearing = probability;
+		}
+
+        inline void setMaximumLakeRadius(const int radius)
+        {
+			m_maximumLakeRadius = radius;
+		}
+
+        inline void setMinimumLakeRadius(const int radius)
+        {
+            m_minimumLakeRadius = radius;
+        }
+
+        inline void setMaximumLakeDepth(const int depth)
+        {
+			m_maximumLakeDepth = depth;
+		}
+
+        inline void setMinimumLakeDepth(const int depth)
+        {
+            m_minimumLakeDepth = depth;
+        }
+
+
         // getters
         inline const int& getSeed() const
         {
@@ -207,6 +255,44 @@ namespace ProceduralGeneration {
         {
             return m_flatFloorLevel;
         }
+
+        inline const Type& getHeightOfTheLakeshore() const
+        {
+			return m_heightOfTheLakeshore;
+		}
+
+        inline const Type& getWaterHeight() const
+        {
+			return m_waterHeight;
+		}
+
+        inline const float& getProbabilityOfALakeAppearing() const
+        {
+            return m_probabilityOfALakeAppearing;
+        }
+
+        inline const int& getMaximumLakeRadius() const
+        {
+			return m_maximumLakeRadius;
+		}
+
+        inline const int& getMinimumLakeRadius() const
+        {
+            return m_minimumLakeRadius;
+        }
+
+        inline const int& getMaximumLakeDepth() const
+        {
+            return m_maximumLakeDepth;
+        }
+
+        inline const int& getMinimumLakeDepth() const
+        {
+			return m_minimumLakeDepth;
+		}
+
+
+       
 
     private:
         inline Type getPerlinNoise2d(const Type& x, const Type& y)
@@ -274,7 +360,9 @@ namespace ProceduralGeneration {
         Type m_exponent;
 
         Type m_flatFloorLevel;
-        Type m_lakeLevel;
+        Type m_heightOfTheLakeshore;
+        Type m_waterHeight;
+
 
         float m_probabilityOfALakeAppearing;
         int m_maximumLakeRadius;
