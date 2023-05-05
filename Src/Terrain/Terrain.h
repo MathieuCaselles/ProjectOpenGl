@@ -46,6 +46,7 @@ public:
 		m_perlinNoise.setOctaves(4);
 		m_perlinNoise.setExponent(3);
 		m_perlinNoise.setFlatFloorLevel(0.1);
+		m_perlinNoise.setWaterHeight(3.5f);
 
 		load();
 	}
@@ -109,6 +110,16 @@ public:
 		m_indices.shrink_to_fit();
 	}
 
+	void setLakeHeight(const Type newHeight)
+	{
+		if (m_perlinNoise.getWaterHeight() != newHeight) {
+			m_perlinNoise.setWaterHeight(newHeight);
+			m_elapsedTimeSinceShouldReload = 0.f;
+			m_shouldReload = true;
+		}
+	
+	}
+
 	void setSeed(int newSeed) {
         if (m_perlinNoise.getSeed() != newSeed) {
             m_perlinNoise.setSeed(newSeed);
@@ -125,12 +136,28 @@ public:
         }
 	};
 
+	void setLacunarity(Type newLacunarity) {
+		if (m_perlinNoise.getLacunarity() != newLacunarity) {
+			m_perlinNoise.setLacunarity(newLacunarity);
+			m_elapsedTimeSinceShouldReload = 0.f;
+			m_shouldReload = true;
+		}
+	};
+
 	void setAmplitude(Type newAmplitude) {
         if (m_perlinNoise.getAmplitude() != newAmplitude) {
             m_perlinNoise.setAmplitude(newAmplitude);
             m_elapsedTimeSinceShouldReload = 0.f;
             m_shouldReload = true;
         }
+	};
+
+	void setPersistance(Type newPersistance) {
+		if (m_perlinNoise.getPersistance() != newPersistance) {
+			m_perlinNoise.setPersistance(newPersistance);
+			m_elapsedTimeSinceShouldReload = 0.f;
+			m_shouldReload = true;
+		}
 	};
 
 	void setOctave(int newOctave) {
@@ -148,6 +175,47 @@ public:
             m_shouldReload = true;
         }
 	};
+
+	void setProbabilityOfALakeAppearing(Type newProbabilityOfALakeAppearing) {
+		if (m_perlinNoise.getProbabilityOfALakeAppearing() != newProbabilityOfALakeAppearing) {
+			m_perlinNoise.setProbabilityOfALakeAppearing(newProbabilityOfALakeAppearing);
+			m_elapsedTimeSinceShouldReload = 0.f;
+			m_shouldReload = true;
+		}
+	};
+
+	void setMaximumLakeRadius(Type newMaximumLakeRadius) {
+		if (m_perlinNoise.getMaximumLakeRadius() != newMaximumLakeRadius) {
+			m_perlinNoise.setMaximumLakeRadius(newMaximumLakeRadius);
+			m_elapsedTimeSinceShouldReload = 0.f;
+			m_shouldReload = true;
+		}
+	};
+
+	void setMinimumLakeRadius(Type newMinimumLakeRadius) {
+		if (m_perlinNoise.getMinimumLakeRadius() != newMinimumLakeRadius) {
+			m_perlinNoise.setMinimumLakeRadius(newMinimumLakeRadius);
+			m_elapsedTimeSinceShouldReload = 0.f;
+			m_shouldReload = true;
+		}
+	};
+
+	void setMaximumLakeDepth(Type newMaximumLakeDepth) {
+		if (m_perlinNoise.getMaximumLakeDepth() != newMaximumLakeDepth) {
+			m_perlinNoise.setMaximumLakeDepth(newMaximumLakeDepth);
+			m_elapsedTimeSinceShouldReload = 0.f;
+			m_shouldReload = true;
+		}
+	};
+
+	void setMinimumLakeDepth(Type newMinimumLakeDepth) {
+		if (m_perlinNoise.getMinimumLakeDepth() != newMinimumLakeDepth) {
+			m_perlinNoise.setMinimumLakeDepth(newMinimumLakeDepth);
+			m_elapsedTimeSinceShouldReload = 0.f;
+			m_shouldReload = true;
+		}
+	};
+
 
 	void showPolygon() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -233,6 +301,7 @@ public:
 
 		glUseProgram(m_program);
 		glBufferData(GL_ARRAY_BUFFER, m_nbVertices * sizeof(vertex_struct_terrain<Type>), m_points.data(), GL_STATIC_DRAW);
+
 	}
 
 	void load()

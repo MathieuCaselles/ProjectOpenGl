@@ -64,8 +64,10 @@ private:
     bool m_customSandHeight = false;
 
     int m_seed = 666;
-    float m_frequency = 6.f;
     float m_amplitude = 20.f;
+    float m_persistance = 0.5f;
+    float m_frequency = 6.f;
+    float m_lacunarity = 0.8f;
     int m_octave = 4;
     float m_exponent = 3.f;
 
@@ -73,6 +75,15 @@ private:
     int m_numberOfFramesSinceLastSecond = 0;
     int m_framesPerSeconds = 0;
 
+    float m_probabilityOfALakeAppearing = 0.0001f;
+    int m_maximumLakeRadius = 80;
+    int m_minimumLakeRadius = 10;
+    int m_maximumLakeDepth = 20;
+    int m_minimumLakeDepth = 5;
+
+
+
+   
     float m_themeColor[3] = {0.2f, 0.2f, 0.2f};
 
     // color between 0 and 1

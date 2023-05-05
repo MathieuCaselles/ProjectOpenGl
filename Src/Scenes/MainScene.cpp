@@ -99,10 +99,21 @@ void MainScene::update(const float& deltaTime)
     }
 
     p_terrain->setSeed(m_seed);
-    p_terrain->setFrequency(m_frequency);
     p_terrain->setAmplitude(m_amplitude);
+    p_terrain->setPersistance(m_persistance);
+    p_terrain->setFrequency(m_frequency);
+    p_terrain->setLacunarity(m_lacunarity);
     p_terrain->setOctave(m_octave);
     p_terrain->setExponent(m_exponent);
+    p_terrain->setExponent(m_exponent);
+    p_terrain->setTerrainSize(m_terrainSize);
+    p_terrain->setProbabilityOfALakeAppearing(m_probabilityOfALakeAppearing);
+    p_terrain->setMaximumLakeRadius(m_maximumLakeRadius);
+    p_terrain->setMinimumLakeRadius(m_minimumLakeRadius);
+    p_terrain->setMaximumLakeDepth(m_maximumLakeDepth);
+    p_terrain->setMinimumLakeDepth(m_minimumLakeDepth);
+
+
 
     switch (m_drawMode) {
         case 0:
@@ -120,11 +131,11 @@ void MainScene::update(const float& deltaTime)
     p_terrain->setStoneAngle(m_stoneAngle);
     p_terrain->setSandHeight(m_sandHeight);
 
+    p_terrain->setLakeHeight(m_waterHeight);
     p_water->setWaterHeight(m_waterHeight);
     p_water->setWaterClearness(m_waterClearness);
 
-    // last because it triggers full reload
-    p_terrain->setTerrainSize(m_terrainSize);
+
     p_water->setWaterSize(m_waterSize);
 
     p_terrain->update(deltaTime);
@@ -163,12 +174,12 @@ void MainScene::createUI() {
     ImGui::PopStyleVar();
 
     ImGui::SeparatorText("Terrain");
-    ImGui::SliderInt("Terrain size", &m_terrainSize, 1, 5000);
+    ImGui::SliderInt("Terrain size", &m_terrainSize, 1, 2500);
     ImGui::Checkbox("Custom water size", &m_customWaterSize);
     if (!m_customWaterSize) {
         ImGui::BeginDisabled();
     }
-    ImGui::SliderInt("Water size", &m_waterSize, 1, 5000);
+    ImGui::SliderInt("Water size", &m_waterSize, 1, 2500);
     if (!m_customWaterSize) {
         ImGui::EndDisabled();
     }
@@ -183,12 +194,28 @@ void MainScene::createUI() {
     ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes the seed. Same seed will always produce the same map.");
     ImGui::SliderFloat("Frequency", &m_frequency, 0.001f, 100.f);
     ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes sampling frequency.");
+    ImGui::SliderFloat("Lacunarity", &m_lacunarity, 0.001f, 2.f);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes lacunarity.");
     ImGui::SliderFloat("Amplitude", &m_amplitude, 0.f, 100.f);
     ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes the maximum height amplitude.");
-    ImGui::SliderInt("Octave", &m_octave, 1, 20);
+    ImGui::SliderFloat("Persistence", &m_persistance, 0.f, 2.f);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes the persistence.");
+    ImGui::SliderInt("Octave", &m_octave, 1, 8);
     ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes the number of octaves used to generate the final perlin noise.");
     ImGui::SliderFloat("Exponent", &m_exponent, 0.f, 100.f);
     ImGui::SameLine(); ImGui::Helpers::HelpMarker("Applies the exponent on redistribution.");
+    ImGui::SliderFloat("Probability Of A Lake Appearing", &m_probabilityOfALakeAppearing, 0.f, 0.001f, "%.8f");
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes number of lakes in the map");
+    ImGui::SliderInt("Maximum Lake Radius", &m_maximumLakeRadius, 5, 150);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes the maximum radius of lakes");
+    ImGui::SliderInt("Minimum Lake Radius", &m_minimumLakeRadius, 5, 150);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes the maximum radius of lakes");
+    ImGui::SliderInt("Maximum Lake Depth", &m_maximumLakeDepth, 5, 150);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes the maximum depth of lakes");
+    ImGui::SliderInt("Minimum Lake Depth", &m_minimumLakeDepth, 5, 150);
+    ImGui::SameLine(); ImGui::Helpers::HelpMarker("Changes the maximum depth of lakes");
+
+
 
     ImGui::SeparatorText("Additional configuration");
     ImGui::SliderFloat("Snow height", &m_snowHeight, 0.f, 100.f);
